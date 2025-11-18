@@ -1,0 +1,954 @@
+<!DOCTYPE html>
+<html lang="id">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Math Detective</title>
+    <style>
+      :root {
+        --accent: #b8860b;
+        --accent-2: #e2b714;
+        --bg1: #f5efe6;
+        --card: #fffaf1;
+        --muted: #6b5b3a;
+      }
+
+      body {
+        font-family: "Poppins", sans-serif;
+        background: linear-gradient(
+          circle at top left,
+          #3b2f2f 0%,
+          #0d0c0a 100%
+        );
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        height: 100vh;
+        margin: 0;
+      }
+
+      .container {
+        display: flex;
+        flex-direction: column;
+        padding: 5vw;
+      }
+
+      /* === Scene style === */
+      section.scene {
+        position: absolute;
+        inset: 0;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        flex-direction: column;
+        padding: 36px;
+        transition: opacity 0.4s ease, transform 0.4s ease;
+        background: transparent;
+      }
+      section.scene.hidden {
+        opacity: 0;
+        pointer-events: none;
+        transform: scale(0.97);
+      }
+      section.scene.visible {
+        opacity: 1;
+        pointer-events: auto;
+        transform: scale(1);
+      }
+
+      /* === Title === */
+      .title {
+        font-size: 48px;
+        font-weight: 900;
+        letter-spacing: 2px;
+        display: flex;
+        gap: 12px;
+        align-items: center;
+        justify-content: center;
+        margin-bottom: 10px;
+      }
+      .title .color {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        width: 70px;
+        height: 70px;
+        border-radius: 12px;
+        color: #ffffff;
+        font-size: 48px;
+        font-weight: 900;
+        box-sizing: border-box;
+      }
+
+      /* Title color variants */
+      .t1 {
+        background: #b88d62;
+      }
+      .t2 {
+        background: #bd924c;
+      }
+      .t3 {
+        background: #d4a056;
+      }
+      .t4 {
+        background: #d1b87f;
+      }
+
+      .subtitle {
+        font-size: 48px;
+        font-weight: 900;
+        color: #4b3b0a;
+        text-align: center;
+        text-transform: uppercase;
+        margin-top: 10px;
+        letter-spacing: 2px;
+      }
+
+      /* === Progress bar === */
+      .bar {
+        height: 18px;
+        background: #ece0cc;
+        border-radius: 999px;
+        padding: 4px;
+        box-shadow: inset 0 2px 6px rgba(0, 0, 0, 0.25);
+        width: 420px;
+        max-width: 80%;
+        margin: 20px auto;
+        display: flex;
+        justify-content: flex-start;
+        align-items: center;
+      }
+      .bar > i {
+        display: block;
+        height: 100%;
+        width: 0%;
+        background: linear-gradient(90deg, var(--accent), var(--accent-2));
+        border-radius: 999px;
+        transition: width 0.3s ease;
+      }
+
+      /* === Buttons === */
+      .btn {
+        background: linear-gradient(90deg, var(--accent), var(--accent-2));
+        color: #fff;
+        padding: 12px 28px;
+        border-radius: 12px;
+        border: 0;
+        font-weight: 700;
+        cursor: pointer;
+        box-shadow: 0 6px 18px rgba(184, 134, 11, 0.3);
+      }
+      .btn.ghost {
+        background: transparent;
+        color: var(--accent-2);
+        border: 2px solid rgba(184, 134, 11, 0.4);
+        box-shadow: none;
+      }
+
+      input {
+        padding: 10px 14px;
+        border-radius: 10px;
+        border: 1px solid #e6edf3;
+        width: 260px;
+        font-size: 16px;
+      }
+
+      /* === Cards === */
+      .welcome-card {
+        padding: 24px 28px;
+        border-radius: 12px;
+        background: linear-gradient(180deg, #fcf7e8, #f0e2c8);
+        box-shadow: 0 8px 24px rgba(0, 0, 0, 0.25);
+        text-align: center;
+      }
+
+      #mission-box {
+        background: #fff8e1;
+        border-radius: 12px;
+        padding: 20px;
+        width: 80%;
+        max-width: 700px;
+        text-align: center;
+        box-shadow: 0 8px 22px rgba(0, 0, 0, 0.25);
+      }
+      #mission-desc {
+        font-size: 18px;
+        margin-bottom: 16px;
+      }
+      #feedback {
+        margin-top: 10px;
+        font-weight: 600;
+        min-height: 28px;
+      }
+      #score {
+        margin-top: 14px;
+        font-size: 16px;
+        color: var(--accent-2);
+      }
+
+      .card {
+        background: #fff3dc;
+        padding: 50px 80px;
+        border-radius: 20px;
+        box-shadow: 0 10px 25px rgba(0, 0, 0, 0.2);
+        text-align: center;
+        width: 80%;
+        max-width: 900px;
+        margin: 0 auto;
+        transition: all 0.3s ease-in-out;
+      }
+      .exploration-tips {
+        margin-top: 10px;
+        background: #f9eac3;
+        padding: 12px;
+        border-radius: 8px;
+      }
+      .mission-buttons {
+        display: grid;
+        grid-template-columns: repeat(4, 1fr);
+        gap: 14px;
+        width: 100%;
+        max-width: 900px;
+        margin: 14px;
+      }
+      .mission-buttons button {
+        border-radius: 10px;
+        padding: 10px 14px;
+        background: linear-gradient(135deg, #d1b87f, #ddc68f);
+        border: 1px solid #bd924c;
+        cursor: pointer;
+      }
+      .small {
+        font-size: 13px;
+        color: var(--muted);
+      }
+      .meta {
+        margin-top: 8px;
+        font-size: 14px;
+        color: var(--muted);
+      }
+      .hint-line {
+        margin-top: 8px;
+        font-size: 14px;
+        color: #9c7b08;
+      }
+
+      .scene.visible .welcome-card,
+      .scene.visible #mission-box {
+        animation: zoomIn 0.5s ease forwards;
+      }
+      .welcome-card:hover,
+      #mission-box:hover {
+        transform: scale(1.05);
+        transition: transform 0.3s ease;
+      }
+
+      /* === Responsive for HP === */
+      @media (max-width: 768px) {
+        .subtitle {
+          font-size: 24px;
+          letter-spacing: 1px;
+        }
+        .card {
+          width: 95%;
+          padding: 30px 20px;
+        }
+        .bar {
+          width: 90%;
+          height: 12px;
+        }
+        input {
+          width: 80%;
+          font-size: 14px;
+        }
+        .btn {
+          padding: 10px 20px;
+          font-size: 14px;
+        }
+        #mission-desc {
+          font-size: 16px;
+        }
+        .mission-buttons {
+          grid-template-columns: repeat(2, 1fr);
+        }
+        .welcome-card {
+          padding: 16px;
+        }
+      }
+    </style>
+  </head>
+
+  <body>
+    <div class="app">
+      <!-- LOADING -->
+      <section id="loading" class="scene hidden">
+        <div style="text-align: center">
+          <div class="title">
+            <span class="color t1">M</span><span class="color t2">A</span
+            ><span class="color t3">T</span><span class="color t4">H</span>
+          </div>
+          <div class="subtitle">DETECTIVE</div>
+          <div style="margin-top: 14px" class="bar"><i id="barFill"></i></div>
+          <p class="note" style="margin-top: 14px">Memuat petualanganmu...</p>
+        </div>
+      </section>
+
+      <!-- START -->
+      <section id="start" class="scene hidden">
+        <div class="welcome-card">
+          <h2>Selamat datang di Math Detective</h2>
+          <p class="note">Ciptakan petualangan yang interaktif!</p>
+          <button id="toForm" class="btn" style="margin-top: 12px">
+            Mulai Petualangan
+          </button>
+        </div>
+      </section>
+
+      <!-- FORM -->
+      <section id="form" class="scene hidden">
+        <div class="welcome-card">
+          <h2>Masukkan Identitasmu</h2>
+          <input id="inputNama" placeholder="Nama Detektif" />
+          <input id="inputKelas" placeholder="Kelas" style="margin-top: 8px" />
+          <div style="margin-top: 12px">
+            <button id="submitProfile" class="btn">Mulai</button>
+            <button id="backToStart" class="btn ghost" style="margin-left: 8px">
+              Kembali
+            </button>
+          </div>
+        </div>
+      </section>
+
+      <!-- WELCOME -->
+      <section id="welcome" class="scene hidden">
+        <div class="welcome-card">
+          <h3 id="welcomeTitle">Selamat datang, Detektif!</h3>
+          <p class="note">Siap untuk menyelesaikan semua misi?</p>
+          <button id="startMission" class="btn" style="margin-top: 12px">
+            Mulai Misi!
+          </button>
+        </div>
+      </section>
+
+      <!-- MISSION INTRO -->
+      <section id="missionIntro" class="scene hidden">
+        <div class="welcome-card">
+          <h2 id="missionIntroTitle"></h2>
+          <div
+            id="missionIntroText"
+            style="font-size: 16px; line-height: 1.6; margin-top: 10px"
+          ></div>
+          <div class="meta" id="missionExploration"></div>
+          <div style="margin-top: 14px">
+            <button id="startCasesBtn" class="btn">Mulai Kasus</button>
+            <button
+              id="backToMissionMenu2"
+              class="btn ghost"
+              style="margin-left: 8px"
+            >
+              Kembali
+            </button>
+          </div>
+        </div>
+      </section>
+
+      <!-- MISSION MENU (created dynamically) -->
+      <section id="missionMain" class="scene hidden"></section>
+
+      <!-- GAME -->
+      <section id="game" class="scene hidden">
+        <div id="mission-box">
+          <h2 id="mission-title">Judul Kasus</h2>
+          <p id="mission-desc"></p>
+
+          <div
+            style="
+              display: flex;
+              gap: 8px;
+              align-items: center;
+              justify-content: center;
+              margin-top: 8px;
+            "
+          >
+            <input
+              type="number"
+              id="answer-input"
+              placeholder="Masukkan jawaban..."
+            />
+            <button id="submitAnswer" class="btn">Kirim Jawaban</button>
+          </div>
+
+          <p id="feedback"></p>
+          <div class="small" id="attemptsLine"></div>
+          <div id="score"></div>
+          <div style="margin-top: 12px">
+            <button id="backToMenuFromGame" class="btn ghost">
+              Kembali ke Menu Misi
+            </button>
+          </div>
+        </div>
+      </section>
+
+      <!-- ENDING -->
+      <section id="ending" class="scene hidden">
+        <div class="welcome-card" id="endingContent"></div>
+      </section>
+    </div>
+
+    <script>
+      /* ---------- Variabel & Helpers ---------- */
+      let profile = null;
+      let loadPct = 0;
+      let score = 0;
+      let currentMission = null;
+      let currentCase = 0;
+      let attemptsLeft = 3;
+      const barFill = document.getElementById("barFill");
+
+      // single showScene that toggles class visible/hidden consistently
+      function showScene(id) {
+        const scenes = document.querySelectorAll(".scene");
+        scenes.forEach((s) => s.classList.add("hidden"));
+        const el = document.getElementById(id);
+        if (el) el.classList.remove("hidden");
+      }
+
+      /* ---------- Loading ---------- */
+      function runLoading() {
+        showScene("loading");
+        const timer = setInterval(() => {
+          loadPct += Math.floor(Math.random() * 12) + 6;
+          if (loadPct > 100) loadPct = 100;
+          barFill.style.width = loadPct + "%";
+          if (loadPct >= 100) {
+            clearInterval(timer);
+            setTimeout(() => showScene("start"), 600);
+          }
+        }, 200);
+      }
+      runLoading();
+
+      /* ---------- Nav ---------- */
+      document.getElementById("toForm").onclick = () => showScene("form");
+      document.getElementById("backToStart").onclick = () => showScene("start");
+
+      document.getElementById("submitProfile").onclick = () => {
+        const name = document.getElementById("inputNama").value.trim();
+        const cls = document.getElementById("inputKelas").value.trim();
+        if (!name || !cls) return alert("Isi nama dan kelas terlebih dahulu!");
+        profile = { name, kelas: cls };
+        document.getElementById(
+          "welcomeTitle"
+        ).textContent = `Selamat datang, Detektif ${name}!`;
+        showScene("welcome");
+      };
+
+      document.getElementById("startMission").onclick = () => {
+        if (!profile) {
+          alert("Isi data dulu!");
+          showScene("form");
+          return;
+        }
+        showMainMissionMenu();
+      };
+
+      /* ---------- Missions Data (7 missions) ---------- */
+      const missionsData = [
+        {
+          id: "bilangan-berpangkat",
+          name: "Kota Eksponen",
+          narrative:
+            "Kota Eksponen diselimuti kabut angka misterius. Untuk membuka kunci kekuatan angka, kamu harus memahami bagaimana bilangan berpangkat bekerja. Di tengah kabut itu, kamu menemukan papan batu kuno dengan pola angka yang berulang. Pola tersebut seolah menjadi pesan tersembunyi tentang cara menghitung kekuatan bilangan. Semakin lama kamu mengamati, semakin jelas bahwa bilangan berpangkat memiliki hubungan erat dengan perkalian berulang. Kamu pun mulai menuliskan angka-angka itu satu per satu sambil mencoba menghubungkan simbol pangkat dengan proses perkalian yang terus berulang. Petunjuk dari batu kuno menunjukkan bahwa setiap pangkat adalah hasil perkalian bilangan yang sama sebanyak pangkatnya. Kini saatnya kamu membuktikan kebenaran pola itu untuk mengembalikan cahaya di Kota Eksponen.",
+          exploration: [
+            "Amati beberapa contoh bilangan berpangkat, seperti 2^3, 3^2, dan 5^4",
+            "Tuliskan setiap bilangan berpangkat tersebut dalam bentuk perkalian berulang, seperti 2^3 = 2 × 2 × 2.",
+            "Hitung hasil dari setiap bentuk perkalian berulang tersebut.",
+            "Bandingkan hasilnya untuk menemukan pola antara bilangan pokok (basis) dan pangkatnya.",
+            "Analisis bagaimana hubungan antara banyaknya faktor yang dikalikan dengan nilai pangkatnya.",
+          ],
+          cases: [
+            {
+              title: "Kasus 1",
+              desc: "Hitung 2^3.",
+              answer: 8,
+              hint: "2^3 = 2×2×2.",
+            },
+            {
+              title: "Kasus 2",
+              desc: "Berapa nilai 5^0?",
+              answer: 1,
+              hint: "Setiap a^0 = 1 untuk a≠0.",
+            },
+            {
+              title: "Kasus 3",
+              desc: "Hitung 2^-2.",
+              answer: 0.25,
+              hint: "a^-n = 1 / a^n.",
+            },
+            {
+              title: "Kasus 4",
+              desc: "Hitung (3^2)^2.",
+              answer: 81,
+              hint: "(a^m)^n = a^(m×n).",
+            },
+            {
+              title: "Kasus 5",
+              desc: "Nilai 16^(1/2) sama dengan?",
+              answer: 4,
+              hint: "Pangkat 1/2 = akar kuadrat.",
+            },
+          ],
+        },
+
+        {
+          id: "teorema-pythagoras",
+          name: "Lembah Pythagoras",
+          narrative:
+            "Perjalananmu berlanjut ke Lembah Pythagoras, tempat segitiga-segitiga raksasa terukir di tebing. Di lembah ini, semua bentuk memiliki hubungan rahasia antara sisi-sisinya. Kamu melihat pola aneh di mana panjang sisi terpanjang selalu berkaitan dengan dua sisi lainnya. Legenda mengatakan, siapa pun yang bisa menemukan hubungan itu akan memahami dasar ruang dan jarak. Untuk mengungkap misteri lembah ini, kamu harus menelusuri bentuk, membandingkan sisi, dan mencari pola keteraturan yang tersembunyi di balik setiap segitiga siku-siku.",
+          exploration: [
+            "Gambarlah beberapa segitiga siku-siku dengan panjang sisi yang berbeda.",
+            "Ukurlah panjang ketiga sisinya (sisi siku-siku dan sisi miring).",
+            "Hitung kuadrat dari masing-masing sisi segitiga",
+            "Bandingkan jumlah kuadrat kedua sisi siku-siku dengan kuadrat sisi miring.",
+            "Temukan pola hubungan antara ketiga sisi segitiga tersebut.",
+          ],
+          cases: [
+            {
+              title: "Kasus 1",
+              desc: "Segitiga siku-siku sisi 3 dan 4. Sisi miring?",
+              answer: 5,
+              hint: "c² = a² + b².",
+            },
+            {
+              title: "Kasus 2",
+              desc: "Sisi miring 13 dan salah satu sisi 5. Sisi lainnya?",
+              answer: 12,
+              hint: "a² = c² - b².",
+            },
+            {
+              title: "Kasus 3",
+              desc: "Apakah 8,15,17 segitiga siku-siku? (1=Ya,0=Tidak)",
+              answer: 1,
+              hint: "Periksa 8²+15² ?= 17².",
+            },
+            {
+              title: "Kasus 4",
+              desc: "Tangga 10 m menyangga tembok 6 m. Jarak kaki ke tembok?",
+              answer: 8,
+              hint: "c² = a² + b².",
+            },
+            {
+              title: "Kasus 5",
+              desc: "Sisi miring 10, salah satu siku 6. Luas?",
+              answer: 24,
+              hint: "Cari sisi lainnya lalu luas = 1/2 × a × b.",
+            },
+          ],
+        },
+
+        {
+          id: "persamaan-linier",
+          name: "Lab Persamaan",
+          narrative:
+            "Misi ini membawamu ke Lab Persamaan, sebuah ruang penelitian di mana setiap rumus harus seimbang sempurna. Di sini, kamu akan menemukan tabung-tabung reaksi berisi angka dan variabel misterius yang harus kamu ungkap nilainya. Setiap langkah yang kamu ambil akan memengaruhi keseimbangan di kedua sisi persamaan. Untuk membuka rahasia formula, kamu harus memahami bagaimana operasi yang sama menjaga kestabilan rumus. Ketelitian dan logika menjadi kunci utama agar hasil percobaanmu tidak meledak menjadi kekacauan angka. Jika kamu berhasil menemukan nilai variabel tersembunyi, cahaya biru persamaan akan menyala menandakan keberhasilanmu mengurai keseimbangan sempurna.",
+          exploration: [
+            "Amati situasi di sekitar yang melibatkan keseimbangan, seperti menimbang benda atau membagi barang secara adil.",
+            "Tuliskan situasi tersebut dalam bentuk kalimat matematika menggunakan tanda =.",
+            "Coba ubah nilai salah satu sisi dan lihat bagaimana keseimbangannya berubah.",
+            "Lakukan operasi yang sama pada kedua sisi agar tetap seimbang.",
+            "Temukan nilai yang membuat kedua sisi persamaan memiliki hasil yang sama dan analisislah.",
+          ],
+          cases: [
+            {
+              title: "Kasus 1",
+              desc: "Jika 2x + 4 = 10, x = ?",
+              answer: 3,
+              hint: "Kurangi 4, lalu bagi 2.",
+            },
+            {
+              title: "Kasus 2",
+              desc: "3x − 7 = 11. x = ?",
+              answer: 6,
+              hint: "Tambahkan 7, bagi 3.",
+            },
+            {
+              title: "Kasus 3",
+              desc: "(x/2) + 5 = 9. x = ?",
+              answer: 8,
+              hint: "Kurangi 5, kalikan 2.",
+            },
+            {
+              title: "Kasus 4",
+              desc: "5x − 3 = 2x + 9. x = ?",
+              answer: 4,
+              hint: "Pindahkan x ke satu sisi.",
+            },
+            {
+              title: "Kasus 5",
+              desc: "4x + 6 = 2x + 14. x = ?",
+              answer: 4,
+              hint: "Kurangi 2x dan 6.",
+            },
+          ],
+        },
+
+        {
+          id: "pertidaksamaan-linier",
+          name: "Zona Ketidakseimbangan",
+          narrative:
+            "Petualangan berlanjut ke Zona Ketidakseimbangan, wilayah tak stabil tempat aturan logika diuji. Di sini, tanda “>” dan “<” menjadi penjaga batas antara kebenaran dan kesalahan. Setiap keputusanmu mengubah keseimbangan angka yang saling bersaing untuk mendominasi. Kamu harus berhati-hati — satu operasi yang salah dapat membalik arah ketidaksamaan dan menghancurkan tatanan wilayah ini. Gunakan kecermatanmu untuk menentukan daerah nilai yang tetap benar di tengah perubahan kondisi. Ketika kamu berhasil memulihkan keseimbangan, cahaya keemasan akan muncul di langit tanda Zona Ketidakseimbangan telah kembali stabil.",
+          exploration: [
+            "Amati situasi sehari-hari yang menunjukkan kondisi “lebih besar” atau “lebih kecil”, misalnya tinggi badan, berat barang, atau uang saku.",
+            "Tuliskan perbandingan tersebut dalam bentuk kalimat matematika menggunakan tanda > atau <",
+            "Coba ubah salah satu nilainya untuk melihat bagaimana tanda ketidaksamaan berubah.",
+            "Lakukan operasi sederhana (penjumlahan atau pengurangan) untuk menjaga hubungan tetap benar",
+            "Temukan nilai variabel yang membuat pernyataan masih sesuai dengan tanda ketidaksamaan",
+          ],
+          cases: [
+            {
+              title: "Kasus 1",
+              desc: "Jika 3x > 9, x = ?",
+              answer: 3,
+              hint: "Bagi kedua sisi 3.",
+            },
+            {
+              title: "Kasus 2",
+              desc: "-2x < 6. x = ?",
+              answer: -3,
+              hint: "Bagi -2 dan ubah arah.",
+            },
+            {
+              title: "Kasus 3",
+              desc: "5x − 10 ≤ 20. Batas x = ?",
+              answer: 6,
+              hint: "Tambah 10, bagi 5.",
+            },
+            {
+              title: "Kasus 4",
+              desc: "-4 ≤ 2x ≤ 6. Batas atas x = ?",
+              answer: 3,
+              hint: "Bagi semua suku dengan 2.",
+            },
+            {
+              title: "Kasus 5",
+              desc: "3x + 7 ≥ 16. Nilai x minimum?",
+              answer: 3,
+              hint: "Kurangi 7 lalu bagi 3.",
+            },
+          ],
+        },
+
+        {
+          id: "relasi-fungsi",
+          name: "Jembatan Relasi",
+          narrative:
+            "Kamu menyeberangi Jembatan Relasi, yang menghubungkan dua dunia angka — dunia x dan dunia y. Setiap papan di jembatan memuat pasangan bilangan yang saling berhubungan. Namun, tidak semua hubungan itu teratur; beberapa papan menunjukkan hubungan ganda yang membingungkan. Tugasmu adalah menemukan hubungan mana yang konsisten dan mana yang disebut “fungsi”. Di bawah jembatan, aliran angka mengalir deras, menandakan bahwa setiap hubungan memiliki arah tertentu. Kamu harus mengenali bagaimana satu nilai x dapat terhubung dengan satu nilai y agar sistem tetap stabil.",
+          exploration: [
+            "Amati pasangan data yang ada di sekitarmu, misalnya nama siswa dan nomor absen, atau nama makanan dan harganya di kantin.",
+            "Catat setiap pasangan data tersebut dalam bentuk tabel atau diagram panah.",
+            "Identifikasi apakah setiap anggota himpunan pertama (domain) memiliki pasangan tepat satu di himpunan kedua (kodomain).",
+            "Diskusikan perbedaan antara relasi dan fungsi berdasarkan hasil pengamatanmu.",
+            "Simpulkan ciri-ciri relasi dan fungsi serta berikan contoh fungsi yang kamu temukan dari kehidupan sehari-hari.",
+          ],
+          cases: [
+            {
+              title: "Kasus 1",
+              desc: "f(x)=2x+3. f(4)=?",
+              answer: 11,
+              hint: "Substitusi x=4.",
+            },
+            {
+              title: "Kasus 2",
+              desc: "A={1,2,3}, B={4,5,6}, relasi 'tambah 3'. Pasangan pertama (1,?)",
+              answer: 4,
+              hint: "1+3=4.",
+            },
+            {
+              title: "Kasus 3",
+              desc: "f(x)=5x-2. f(3)=?",
+              answer: 13,
+              hint: "Substitusi x=3.",
+            },
+            {
+              title: "Kasus 4",
+              desc: "f(x)=x^2. f(-4)=?",
+              answer: 16,
+              hint: "Kuadratkan -4.",
+            },
+            {
+              title: "Kasus 5",
+              desc: "Domain{2,3,4}, range{4,6,8}. Relasi mungkin? (1=Ya,0=Tidak)",
+              answer: 1,
+              hint: "Setiap x dikalikan 2.",
+            },
+          ],
+        },
+
+        {
+          id: "persamaan-garis-lurus",
+          name: "Garis Kota",
+          narrative:
+            "Langkahmu kini tiba di Garis Kota, wilayah perkotaan yang terbentang dengan jalur-jalur lurus bagaikan benang koordinat. Setiap jalan di sini memiliki arah dan kemiringan tersendiri yang menentukan seberapa tajam sebuah lintasan menanjak atau menurun. Di antara bangunan-bangunan tinggi, kamu menemukan tanda-tanda misterius pada dinding: rumus-rumus yang menggambarkan persamaan garis lurus. Untuk membuka rahasia kota ini, kamu harus menelusuri hubungan antara gradien dan titik potong sumbu, lalu menemukan bagaimana keduanya membentuk garis sempurna di bidang koordinat. Saat kamu menemukan rumus yang tepat, jaringan jalan kota akan bersinar, memperlihatkan pola simetris yang menandakan keseimbangan antara arah dan posisi.",
+          exploration: [
+            "Gambarlah beberapa garis di bidang koordinat dengan kemiringan (gradien) yang berbeda.",
+            "Perhatikan bagaimana posisi garis berubah ketika gradien atau titik potong sumbu-y diubah.",
+            "Tuliskan pola hubungan antara x dan y pada setiap garis yang kamu buat.",
+            "Temukan bentuk umum dari hubungan tersebut, yaitu y = mx + c.",
+            "Analisis arti dari m (gradien) dan c (titik potong sumbu-y) dalam konteks perubahan garis.",
+          ],
+          cases: [
+            {
+              title: "Kasus 1",
+              desc: "Lewati (1,2) dan (3,6). Gradien m=?",
+              answer: 2,
+              hint: "m=(6-2)/(3-1).",
+            },
+            {
+              title: "Kasus 2",
+              desc: "Jika m=2 dan lewat (0,1). c=?",
+              answer: 1,
+              hint: "1=2×0+c.",
+            },
+            {
+              title: "Kasus 3",
+              desc: "Titik (2,5) dan (4,9), m=?",
+              answer: 2,
+              hint: "m=(9-5)/(4-2).",
+            },
+            {
+              title: "Kasus 4",
+              desc: "y=3x+2, y saat x=1?",
+              answer: 5,
+              hint: "Substitusi x=1.",
+            },
+            {
+              title: "Kasus 5",
+              desc: "Titik potong y y=-x+4?",
+              answer: 4,
+              hint: "Saat x=0.",
+            },
+          ],
+        },
+
+        {
+          id: "statistika",
+          name: "Menara Statistika",
+          narrative:
+            "Misi terakhir membawamu ke Menara Statistika, tempat di mana seluruh data dari penjuru negeri dikumpulkan. Dinding menara dipenuhi angka-angka yang mewakili hasil observasi kehidupan warga. Namun, data tersebut acak dan tidak bermakna tanpa pengamatan yang cermat. Untuk menemukan makna di balik angka, kamu harus menyusun, mengelompokkan, dan menafsirkan pola data. Di puncak menara, simbol misterius akan muncul hanya jika kamu dapat menemukan nilai yang mewakili keseluruhan data dengan tepat. Inilah ujian terakhirmu sebagai detektif matematika.",
+          exploration: [
+            "Kumpulkan data sederhana dari teman sekelasmu, misalnya tinggi badan, jumlah saudara, atau lama waktu belajar setiap hari.",
+            "Susun data dari nilai terendah hingga tertinggi agar mudah diamati.",
+            "Amati dan bandingkan: nilai mana yang paling sering muncul? Nilai itu disebut modus.",
+            "Tentukan nilai tengah dari data yang sudah diurutkan — itulah median.",
+            "Jumlahkan semua data, lalu bagi dengan banyaknya data — hasilnya disebut mean atau rata-rata.",
+          ],
+          cases: [
+            {
+              title: "Kasus 1",
+              desc: "Nilai ujian: 70, 80, 90. Berapa rata-ratanya?",
+              answer: 80,
+              hint: "Jumlahkan lalu bagi banyak data.",
+            },
+            {
+              title: "Kasus 2",
+              desc: "Data: 2,3,3,4,5,5,5,6. Modus?",
+              answer: 5,
+              hint: "Angka paling sering muncul.",
+            },
+            {
+              title: "Kasus 3",
+              desc: "Data: 3,5,7,9,11,13. Median?",
+              answer: 8,
+              hint: "Rata-rata dua nilai tengah.",
+            },
+            {
+              title: "Kasus 4",
+              desc: "Rata-rata dari 4 bilangan adalah 8. Jika tiga bilangan pertama 6, 7, 9, maka bilangan keempat adalah?",
+              answer: 10,
+              hint: "Jumlah total = 4 × 8.",
+            },
+            {
+              title: "Kasus 5",
+              desc: "Data 5,8,7,6,9. Mean?",
+              answer: 7,
+              hint: "Jumlahkan lalu bagi banyak data.",
+            },
+          ],
+        },
+      ];
+
+      /* ---------- Show mission menu (dynamically create) ---------- */
+      function showMainMissionMenu() {
+        const container = document.getElementById("missionMain");
+        container.innerHTML = ""; // bersihkan dulu
+        const card = document.createElement("div");
+        card.className = "card";
+        card.innerHTML = `
+    <h2>Pilih Misi Detektif Matematika</h2>
+    <div class="mission-buttons" id="mainMissionButtons"></div>
+    <div style="margin-top:12px"><button class="btn ghost" id="backToWelcomeBtn">Kembali</button></div>
+  `;
+        container.appendChild(card);
+
+        const btnBox = card.querySelector("#mainMissionButtons");
+        missionsData.forEach((m) => {
+          const b = document.createElement("button");
+          b.className = "btn";
+          b.textContent = m.name;
+          b.onclick = () => showMissionIntro(m);
+          btnBox.appendChild(b);
+        });
+
+        card.querySelector("#backToWelcomeBtn").onclick = () =>
+          showScene("welcome");
+        showScene("missionMain");
+      }
+
+      /* ---------- Show mission intro ---------- */
+      function showMissionIntro(mission) {
+        currentMission = mission;
+        document.getElementById("missionIntroTitle").textContent = mission.name;
+        document.getElementById("missionIntroText").innerHTML =
+          mission.narrative || "";
+        // render exploration list
+        const expl = mission.exploration || [];
+        const explorHtml = `<div class="exploration-tips"><h3>🧭 Petunjuk Eksplorasi:</h3><ol>${expl
+          .map((x) => `<li>${x}</li>`)
+          .join("")}</ol></div>`;
+        document.getElementById("missionExploration").innerHTML = explorHtml;
+
+        // set tombol mulai (pastikan event handler tidak ditambahkan berkali-kali)
+        const startBtn = document.getElementById("startCasesBtn");
+        startBtn.onclick = null;
+        startBtn.onclick = () => startMissionCases(mission);
+
+        document.getElementById("backToMissionMenu2").onclick =
+          showMainMissionMenu;
+        showScene("missionIntro");
+      }
+
+      /* ---------- Game logic: attempts, scoring ---------- */
+      const missionTitle = document.getElementById("mission-title");
+      const missionDesc = document.getElementById("mission-desc");
+      const feedback = document.getElementById("feedback");
+      const scoreBox = document.getElementById("score");
+      const answerInput = document.getElementById("answer-input");
+      const attemptsLine = document.getElementById("attemptsLine");
+
+      function startMissionCases(mission) {
+        currentMission = mission;
+        currentCase = 0;
+        score = 0;
+        attemptsLeft = 3;
+        showCase();
+        showScene("game");
+      }
+
+      function showCase() {
+        const c = currentMission.cases[currentCase];
+        missionTitle.textContent = c.title;
+        missionDesc.textContent = c.desc;
+        feedback.textContent = "";
+        answerInput.value = "";
+        attemptsLeft = 3;
+        attemptsLine.textContent = `Kesempatan tersisa: ${attemptsLeft} (maks 3)`;
+        scoreBox.textContent = `Skor: ${score}`;
+      }
+
+      document.getElementById("submitAnswer").onclick = () => {
+        const raw = answerInput.value;
+        if (raw === "") {
+          feedback.textContent = "Masukkan jawaban terlebih dahulu.";
+          return;
+        }
+        const user = parseFloat(raw);
+        const c = currentMission.cases[currentCase];
+
+        // compare numbers allowing for decimals (to avoid floating point issues, compare rounded to 6 decimals)
+        function equalNumbers(a, b) {
+          return Math.abs(a - b) < 1e-6;
+        }
+
+        if (equalNumbers(user, c.answer)) {
+          feedback.textContent = "✔ Tepat sekali, Detektif!";
+          score += 20;
+          scoreBox.textContent = `Skor: ${score}`;
+          // lanjut ke kasus berikutnya setelah delay singkat
+          setTimeout(() => {
+            currentCase++;
+            if (currentCase < currentMission.cases.length) {
+              showCase();
+            } else {
+              showEnding();
+            }
+          }, 700);
+        } else {
+          // salah
+          attemptsLeft--;
+          score -= 5; // penalti, bisa diubah jika tidak diinginkan
+          if (attemptsLeft > 0) {
+            feedback.textContent = `❌ Jawaban belum tepat. Petunjuk: ${c.hint} (Kesempatan tersisa: ${attemptsLeft})`;
+            attemptsLine.textContent = `Kesempatan tersisa: ${attemptsLeft} (maks 3)`;
+            scoreBox.textContent = `Skor: ${score}`;
+          } else {
+            // kesempatan habis -> tampil pesan, lanjut ke kasus berikutnya (tanpa menampilkan jawaban)
+            feedback.textContent = `❌ Kesempatan habis untuk kasus ini. Petunjuk diberikan sebelumnya. Lanjut ke kasus berikutnya.`;
+            attemptsLine.textContent = `Kesempatan habis.`;
+            scoreBox.textContent = `Skor: ${score}`;
+            setTimeout(() => {
+              currentCase++;
+              if (currentCase < currentMission.cases.length) {
+                showCase();
+              } else {
+                showEnding();
+              }
+            }, 900);
+          }
+        }
+      };
+
+      // tombol kembali ke menu dari dalam permainan
+      document.getElementById("backToMenuFromGame").onclick = () => {
+        if (
+          confirm(
+            "Keluar dari misi dan kembali ke menu misi? Skor akan hilang untuk misi ini."
+          )
+        ) {
+          showMainMissionMenu();
+        }
+      };
+
+      /* ---------- Ending ---------- */
+      function showEnding() {
+        // tandai completed jika perlu
+        currentMission.completed = true;
+
+        const content = document.getElementById("endingContent");
+        const totalPossible = currentMission.cases.length * 20;
+        let msg = "";
+        if (score === totalPossible) {
+          msg = `🎉 Hebat, Detektif ${profile.name}! Kamu berhasil menyelesaikan seluruh kasus di "${currentMission.name}" dengan skor sempurna ${score}/${totalPossible}!`;
+        } else if (score >= totalPossible * 0.6) {
+          msg = `🕵️‍♀️ Bagus, Detektif ${profile.name}. Kamu menyelesaikan misi "${currentMission.name}" dengan skor ${score}/${totalPossible}. Terus latih agar semakin sempurna!`;
+        } else {
+          msg = `💭 Tetap semangat, Detektif ${profile.name}! Kamu menyelesaikan misi "${currentMission.name}" dengan skor ${score}/${totalPossible}. Coba ulang misi untuk meningkatkan hasilmu.`;
+        }
+
+        content.innerHTML = `
+          <h2>Misi Selesai!</h2>
+          <p>${msg}</p>
+          <div style="margin-top:12px; display:flex; gap:8px; justify-content:center;">
+            <button id="repeatMission" class="btn">Ulangi Misi Ini</button>
+            <button id="backToMissionMenu" class="btn ghost">Kembali ke Pilihan Misi</button>
+          </div>
+        `;
+        document.getElementById("repeatMission").onclick = () => {
+          startMissionCases(currentMission);
+        };
+        document.getElementById("backToMissionMenu").onclick =
+          showMainMissionMenu;
+        showScene("ending");
+      }
+    </script>
+  </body>
+</html>

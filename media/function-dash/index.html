@@ -1,0 +1,1719 @@
+<!doctype html>
+<html lang="id">
+ <head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Function Dash ✨</title>
+  <script src="/_sdk/data_sdk.js"></script>
+  <script src="/_sdk/element_sdk.js"></script>
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800;900&amp;family=Nunito:wght@300;400;500;600;700;800;900&amp;display=swap" rel="stylesheet">
+  <style>
+        body {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: 'Poppins', sans-serif;
+            background: linear-gradient(135deg, #B8E8FC 0%, #FFF5B8 100%);
+            min-height: 100%;
+            overflow-x: hidden;
+        }
+
+        html {
+            height: 100%;
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 20px;
+            min-height: 100%;
+        }
+
+        .page {
+            display: none;
+            animation: slideInFromRight 0.8s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+        }
+
+        .page.active {
+            display: block;
+        }
+
+        @keyframes slideInFromRight {
+            from { 
+                opacity: 0; 
+                transform: translateX(50px); 
+            }
+            to { 
+                opacity: 1; 
+                transform: translateX(0); 
+            }
+        }
+
+        @keyframes bounceIn {
+            0% { 
+                opacity: 0; 
+                transform: scale(0.3) translateY(-50px); 
+            }
+            50% { 
+                opacity: 1; 
+                transform: scale(1.05) translateY(0); 
+            }
+            70% { 
+                transform: scale(0.95); 
+            }
+            100% { 
+                transform: scale(1); 
+            }
+        }
+
+        @keyframes gentleBounce {
+            0%, 20%, 50%, 80%, 100% { 
+                transform: translateY(0); 
+            }
+            40% { 
+                transform: translateY(-8px); 
+            }
+            60% { 
+                transform: translateY(-4px); 
+            }
+        }
+
+        @keyframes runnerMove {
+            0%, 100% { 
+                transform: scaleX(1) translateY(0); 
+            }
+            25% { 
+                transform: scaleX(1.1) translateY(-3px); 
+            }
+            50% { 
+                transform: scaleX(0.9) translateY(0); 
+            }
+            75% { 
+                transform: scaleX(1.1) translateY(-2px); 
+            }
+        }
+
+        @keyframes successJump {
+            0% { 
+                transform: translateY(0) scale(1) rotate(0deg); 
+            }
+            30% { 
+                transform: translateY(-25px) scale(1.2) rotate(5deg); 
+            }
+            60% { 
+                transform: translateY(-15px) scale(1.1) rotate(-3deg); 
+            }
+            100% { 
+                transform: translateY(0) scale(1) rotate(0deg); 
+            }
+        }
+
+        @keyframes stumbleAnimation {
+            0%, 100% { 
+                transform: translateX(0) rotate(0deg) scale(1); 
+            }
+            20% { 
+                transform: translateX(-8px) rotate(-8deg) scale(0.9); 
+            }
+            40% { 
+                transform: translateX(8px) rotate(8deg) scale(0.95); 
+            }
+            60% { 
+                transform: translateX(-5px) rotate(-5deg) scale(0.92); 
+            }
+            80% { 
+                transform: translateX(3px) rotate(3deg) scale(0.98); 
+            }
+        }
+
+        @keyframes pulseGlow {
+            0%, 100% { 
+                transform: scale(1); 
+                box-shadow: 0 0 20px rgba(72, 187, 120, 0.4); 
+            }
+            50% { 
+                transform: scale(1.05); 
+                box-shadow: 0 0 30px rgba(72, 187, 120, 0.8); 
+            }
+        }
+
+        @keyframes shimmer {
+            0% { 
+                background-position: -200% 0; 
+            }
+            100% { 
+                background-position: 200% 0; 
+            }
+        }
+
+        .card {
+            background: rgba(255, 255, 255, 0.95);
+            border-radius: 30px;
+            padding: 45px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.1), 0 8px 25px rgba(0, 0, 0, 0.05);
+            backdrop-filter: blur(20px);
+            margin: 25px 0;
+            border: 3px solid rgba(255, 255, 255, 0.4);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.3), transparent);
+            transition: left 0.8s;
+        }
+
+        .card:hover::before {
+            left: 100%;
+        }
+
+        .main-title {
+            text-align: center;
+            font-size: 4rem;
+            font-weight: 900;
+            background: linear-gradient(45deg, #4299E1, #ED64A6, #48BB78, #ECC94B);
+            background-size: 300% 300%;
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            margin-bottom: 20px;
+            text-shadow: 2px 2px 8px rgba(0, 0, 0, 0.1);
+            animation: gentleBounce 3s infinite, shimmer 4s ease-in-out infinite;
+            letter-spacing: 2px;
+        }
+
+        .subtitle {
+            text-align: center;
+            font-size: 1.6rem;
+            color: #2D3748;
+            margin-bottom: 45px;
+            font-weight: 600;
+            text-shadow: 1px 1px 3px rgba(0, 0, 0, 0.1);
+        }
+
+        .form-group {
+            margin-bottom: 30px;
+        }
+
+        .form-label {
+            display: block;
+            font-weight: 700;
+            color: #2D3748;
+            margin-bottom: 12px;
+            font-size: 1.2rem;
+        }
+
+        .form-input {
+            width: 100%;
+            padding: 22px;
+            border: 4px solid #E2E8F0;
+            border-radius: 25px;
+            font-size: 1.2rem;
+            font-family: 'Poppins', sans-serif;
+            font-weight: 500;
+            transition: all 0.4s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+            background: rgba(255, 255, 255, 0.95);
+            box-shadow: inset 0 2px 8px rgba(0, 0, 0, 0.05);
+        }
+
+        .form-input:focus {
+            outline: none;
+            border-color: #B8E8FC;
+            box-shadow: 0 0 0 6px rgba(184, 232, 252, 0.3), inset 0 2px 8px rgba(0, 0, 0, 0.05);
+            transform: translateY(-3px);
+            background: rgba(255, 255, 255, 1);
+        }
+
+        .gender-options {
+            display: flex;
+            gap: 25px;
+            justify-content: center;
+            flex-wrap: wrap;
+        }
+
+        .gender-option {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 15px;
+            padding: 25px;
+            border: 4px solid #E2E8F0;
+            border-radius: 25px;
+            cursor: pointer;
+            transition: all 0.4s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+            background: rgba(255, 255, 255, 0.9);
+            min-width: 140px;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .gender-option::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(184, 232, 252, 0.3), transparent);
+            transition: left 0.5s;
+        }
+
+        .gender-option:hover::before {
+            left: 100%;
+        }
+
+        .gender-option:hover {
+            border-color: #B8E8FC;
+            background: rgba(184, 232, 252, 0.2);
+            transform: translateY(-5px) scale(1.02);
+            box-shadow: 0 15px 35px rgba(0, 0, 0, 0.15);
+        }
+
+        .gender-option.selected {
+            border-color: #FFD6EC;
+            background: rgba(255, 214, 236, 0.4);
+            transform: scale(1.08);
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.2);
+        }
+
+        .gender-avatar {
+            font-size: 4rem;
+            margin-bottom: 8px;
+            animation: gentleBounce 2s infinite;
+        }
+
+        .btn {
+            padding: 22px 40px;
+            border: none;
+            border-radius: 25px;
+            font-size: 1.3rem;
+            font-weight: 800;
+            cursor: pointer;
+            transition: all 0.4s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+            font-family: 'Poppins', sans-serif;
+            box-shadow: 0 12px 30px rgba(0, 0, 0, 0.15);
+            text-transform: uppercase;
+            letter-spacing: 1.5px;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .btn::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.4), transparent);
+            transition: left 0.6s;
+        }
+
+        .btn:hover::before {
+            left: 100%;
+        }
+
+        .btn:hover {
+            transform: translateY(-4px) scale(1.02);
+            box-shadow: 0 18px 40px rgba(0, 0, 0, 0.25);
+        }
+
+        .btn:active {
+            transform: translateY(-2px) scale(0.98);
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, #B8E8FC, #4299E1);
+            color: white;
+        }
+
+        .btn-secondary {
+            background: linear-gradient(135deg, #FFD6EC, #ED64A6);
+            color: white;
+        }
+
+        .btn-success {
+            background: linear-gradient(135deg, #C6F6D5, #48BB78);
+            color: white;
+        }
+
+        .btn-warning {
+            background: linear-gradient(135deg, #FFF5B8, #ECC94B);
+            color: #2D3748;
+        }
+
+        .btn-danger {
+            background: linear-gradient(135deg, #FED7D7, #F56565);
+            color: white;
+        }
+
+        .profile-section {
+            display: flex;
+            align-items: center;
+            gap: 40px;
+            margin-bottom: 50px;
+            flex-wrap: wrap;
+        }
+
+        .profile-avatar {
+            width: 120px;
+            height: 120px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, #B8E8FC, #FFD6EC);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 4rem;
+            box-shadow: 0 15px 40px rgba(0, 0, 0, 0.2);
+            animation: gentleBounce 4s infinite;
+            border: 5px solid rgba(255, 255, 255, 0.8);
+        }
+
+        .profile-info h2 {
+            margin: 0 0 15px 0;
+            color: #2D3748;
+            font-size: 2.5rem;
+            font-weight: 800;
+        }
+
+        .profile-stats {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 25px;
+            margin: 40px 0;
+        }
+
+        .stat-card {
+            background: rgba(255, 255, 255, 0.9);
+            padding: 30px;
+            border-radius: 20px;
+            text-align: center;
+            border: 3px solid #E2E8F0;
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .stat-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.5), transparent);
+            transition: left 0.6s;
+        }
+
+        .stat-card:hover::before {
+            left: 100%;
+        }
+
+        .stat-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 15px 35px rgba(0, 0, 0, 0.15);
+        }
+
+        .level-selection {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+            gap: 30px;
+            margin: 50px 0;
+        }
+
+        .level-card {
+            background: rgba(255, 255, 255, 0.98);
+            border-radius: 30px;
+            padding: 40px;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.5s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+            border: 5px solid transparent;
+            position: relative;
+            overflow: hidden;
+            box-shadow: 0 15px 40px rgba(0, 0, 0, 0.1);
+        }
+
+        .level-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.6), transparent);
+            transition: left 0.7s;
+        }
+
+        .level-card:hover::before {
+            left: 100%;
+        }
+
+        .level-card:hover {
+            transform: translateY(-10px) scale(1.03);
+            box-shadow: 0 25px 60px rgba(0, 0, 0, 0.2);
+        }
+
+        .level-card.easy {
+            border-color: #48BB78;
+            background: linear-gradient(135deg, rgba(72, 187, 120, 0.15), rgba(255, 255, 255, 0.98));
+        }
+
+        .level-card.medium {
+            border-color: #ECC94B;
+            background: linear-gradient(135deg, rgba(236, 201, 75, 0.15), rgba(255, 255, 255, 0.98));
+        }
+
+        .level-card.hard {
+            border-color: #F56565;
+            background: linear-gradient(135deg, rgba(245, 101, 101, 0.15), rgba(255, 255, 255, 0.98));
+        }
+
+        .level-icon {
+            font-size: 5rem;
+            margin-bottom: 20px;
+            display: block;
+            animation: gentleBounce 2s infinite;
+        }
+
+        .game-container {
+            background: rgba(255, 255, 255, 0.98);
+            border-radius: 30px;
+            padding: 35px;
+            margin: 25px 0;
+            box-shadow: 0 20px 50px rgba(0, 0, 0, 0.12);
+            border: 3px solid rgba(255, 255, 255, 0.5);
+        }
+
+        .game-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 30px;
+            flex-wrap: wrap;
+            gap: 20px;
+        }
+
+        .game-stats {
+            display: flex;
+            gap: 30px;
+            align-items: center;
+            flex-wrap: wrap;
+        }
+
+        .stat-item {
+            background: linear-gradient(135deg, #B8E8FC, rgba(184, 232, 252, 0.4));
+            padding: 15px 25px;
+            border-radius: 20px;
+            font-weight: 800;
+            color: #2D3748;
+            border: 3px solid rgba(255, 255, 255, 0.6);
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+        }
+
+        .timer {
+            background: linear-gradient(135deg, #FFF5B8, rgba(255, 245, 184, 0.4));
+            font-size: 1.4rem;
+            animation: pulseGlow 2s infinite;
+            border-color: #ECC94B;
+        }
+
+        .race-track {
+            background: linear-gradient(to right, #E6FFFA 0%, #B2F5EA 30%, #81E6D9 70%, #4FD1C7 100%);
+            border-radius: 25px;
+            padding: 40px;
+            margin: 30px 0;
+            position: relative;
+            min-height: 200px;
+            border: 4px solid #4FD1C7;
+            overflow: hidden;
+            box-shadow: inset 0 4px 15px rgba(0, 0, 0, 0.1);
+        }
+
+        .track-lines {
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-image: 
+                repeating-linear-gradient(
+                    0deg,
+                    transparent,
+                    transparent 40px,
+                    rgba(255, 255, 255, 0.4) 40px,
+                    rgba(255, 255, 255, 0.4) 44px
+                ),
+                repeating-linear-gradient(
+                    90deg,
+                    transparent,
+                    transparent 60px,
+                    rgba(255, 255, 255, 0.2) 60px,
+                    rgba(255, 255, 255, 0.2) 62px
+                );
+        }
+
+        .start-finish-area {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            height: 120px;
+            position: relative;
+            z-index: 2;
+        }
+
+        .start-line, .finish-line {
+            width: 12px;
+            height: 110px;
+            position: relative;
+            border-radius: 6px;
+            box-shadow: 0 5px 20px rgba(0, 0, 0, 0.3);
+        }
+
+        .start-line {
+            background: linear-gradient(to bottom, #4299E1, #2B6CB0, #1A365D);
+            box-shadow: 0 0 25px rgba(66, 153, 225, 0.8);
+        }
+
+        .start-line::after {
+            content: 'START';
+            position: absolute;
+            top: -35px;
+            left: 50%;
+            transform: translateX(-50%);
+            font-weight: 900;
+            color: #2B6CB0;
+            font-size: 1rem;
+            text-shadow: 1px 1px 3px rgba(0, 0, 0, 0.3);
+        }
+
+        .finish-line {
+            background: linear-gradient(to bottom, #48BB78, #38A169, #2F855A);
+            box-shadow: 0 0 25px rgba(72, 187, 120, 0.8);
+            animation: pulseGlow 3s infinite;
+        }
+
+        .finish-line::after {
+            content: 'FINISH';
+            position: absolute;
+            top: -35px;
+            left: 50%;
+            transform: translateX(-50%);
+            font-weight: 900;
+            color: #38A169;
+            font-size: 1rem;
+            text-shadow: 1px 1px 3px rgba(0, 0, 0, 0.3);
+        }
+
+        .runner {
+            position: absolute;
+            right: 70px;
+            top: 40px;
+            font-size: 4rem;
+            transition: right 1.5s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+            z-index: 10;
+            filter: drop-shadow(3px 3px 8px rgba(0, 0, 0, 0.4));
+        }
+
+        .runner.running {
+            animation: runnerMove 0.5s infinite;
+        }
+
+        .runner.jumping {
+            animation: successJump 1s ease-out;
+        }
+
+        .runner.stumbling {
+            animation: stumbleAnimation 0.8s ease-out;
+        }
+
+        .question-panel {
+            background: rgba(255, 255, 255, 0.98);
+            border-radius: 25px;
+            padding: 40px;
+            margin: 30px 0;
+            text-align: center;
+            border: 4px solid #E2E8F0;
+            box-shadow: 0 15px 35px rgba(0, 0, 0, 0.1);
+        }
+
+        .question-text {
+            font-size: 2.2rem;
+            font-weight: 800;
+            color: #2D3748;
+            margin-bottom: 35px;
+            background: linear-gradient(45deg, #4299E1, #ED64A6, #48BB78);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.1);
+        }
+
+        .answer-options {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 25px;
+            margin-top: 30px;
+        }
+
+        .answer-option {
+            background: rgba(255, 255, 255, 0.95);
+            border: 5px solid #E2E8F0;
+            border-radius: 25px;
+            padding: 30px;
+            cursor: pointer;
+            transition: all 0.4s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+            text-align: center;
+            position: relative;
+            overflow: hidden;
+            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.1);
+        }
+
+        .answer-option::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.7), transparent);
+            transition: left 0.4s;
+        }
+
+        .answer-option:hover::before {
+            left: 100%;
+        }
+
+        .answer-option:hover {
+            border-color: #B8E8FC;
+            background: rgba(184, 232, 252, 0.3);
+            transform: translateY(-8px) scale(1.02);
+            box-shadow: 0 15px 35px rgba(0, 0, 0, 0.2);
+        }
+
+        .answer-option.correct {
+            border-color: #48BB78;
+            background: rgba(72, 187, 120, 0.3);
+            animation: successJump 0.8s ease-out;
+            box-shadow: 0 0 30px rgba(72, 187, 120, 0.5);
+        }
+
+        .answer-option.incorrect {
+            border-color: #F56565;
+            background: rgba(245, 101, 101, 0.3);
+            animation: stumbleAnimation 0.7s ease-out;
+            box-shadow: 0 0 30px rgba(245, 101, 101, 0.5);
+        }
+
+        .answer-option.disabled {
+            pointer-events: none;
+            opacity: 0.7;
+        }
+
+        .option-label {
+            font-size: 1.6rem;
+            font-weight: 800;
+            color: #2D3748;
+            margin-bottom: 12px;
+        }
+
+        .option-value {
+            font-size: 2.2rem;
+            font-weight: 900;
+            color: #4299E1;
+        }
+
+        .feedback-popup {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background: rgba(255, 255, 255, 0.98);
+            padding: 40px 60px;
+            border-radius: 30px;
+            font-size: 2.5rem;
+            font-weight: 900;
+            box-shadow: 0 25px 70px rgba(0, 0, 0, 0.4);
+            z-index: 2000;
+            display: none;
+            text-align: center;
+            border: 5px solid;
+            backdrop-filter: blur(15px);
+        }
+
+        .feedback-popup.correct {
+            color: #48BB78;
+            border-color: #48BB78;
+            animation: successJump 0.8s ease-out;
+        }
+
+        .feedback-popup.incorrect {
+            color: #F56565;
+            border-color: #F56565;
+            animation: stumbleAnimation 0.7s ease-out;
+        }
+
+        .results-container {
+            text-align: center;
+            background: rgba(255, 255, 255, 0.98);
+            border-radius: 30px;
+            padding: 60px;
+            margin: 30px 0;
+            position: relative;
+            overflow: hidden;
+            box-shadow: 0 25px 70px rgba(0, 0, 0, 0.15);
+        }
+
+        .results-title {
+            font-size: 3.5rem;
+            font-weight: 900;
+            margin-bottom: 40px;
+            background: linear-gradient(45deg, #4299E1, #ED64A6, #48BB78, #ECC94B);
+            background-size: 300% 300%;
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            animation: shimmer 3s ease-in-out infinite;
+        }
+
+        .results-stats {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 30px;
+            margin: 50px 0;
+        }
+
+        .result-stat {
+            background: rgba(184, 232, 252, 0.3);
+            padding: 35px;
+            border-radius: 25px;
+            border: 4px solid #B8E8FC;
+            transition: all 0.3s ease;
+        }
+
+        .result-stat:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 15px 35px rgba(0, 0, 0, 0.15);
+        }
+
+        .confetti-container {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: 1500;
+        }
+
+        .confetti-piece {
+            position: absolute;
+            width: 15px;
+            height: 15px;
+            border-radius: 50%;
+            animation: confetti-fall 5s linear infinite;
+        }
+
+        @keyframes confetti-fall {
+            0% {
+                transform: translateY(-100%) rotate(0deg);
+                opacity: 1;
+            }
+            100% {
+                transform: translateY(calc(100vh + 100px)) rotate(720deg);
+                opacity: 0;
+            }
+        }
+
+        .btn-group {
+            display: flex;
+            gap: 25px;
+            justify-content: center;
+            flex-wrap: wrap;
+            margin-top: 40px;
+        }
+
+        .loading {
+            display: inline-block;
+            width: 24px;
+            height: 24px;
+            border: 4px solid rgba(255, 255, 255, 0.3);
+            border-radius: 50%;
+            border-top-color: #fff;
+            animation: spin 1s ease-in-out infinite;
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+
+        /* Responsive Design */
+        @media (max-width: 1024px) {
+            .container {
+                padding: 18px;
+            }
+            
+            .main-title {
+                font-size: 3.2rem;
+            }
+            
+            .level-selection {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .container {
+                padding: 15px;
+            }
+            
+            .main-title {
+                font-size: 2.8rem;
+            }
+            
+            .answer-options {
+                grid-template-columns: 1fr;
+            }
+            
+            .game-stats {
+                justify-content: center;
+            }
+            
+            .profile-section {
+                flex-direction: column;
+                text-align: center;
+            }
+            
+            .card {
+                padding: 30px;
+            }
+            
+            .question-text {
+                font-size: 1.8rem;
+            }
+            
+            .runner {
+                font-size: 3rem;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .main-title {
+                font-size: 2.2rem;
+            }
+            
+            .gender-options {
+                flex-direction: column;
+                align-items: center;
+            }
+            
+            .btn-group {
+                flex-direction: column;
+                align-items: center;
+            }
+            
+            .btn {
+                width: 100%;
+                max-width: 300px;
+            }
+        }
+    </style>
+  <style>@view-transition { navigation: auto; }</style>
+  <script src="https://cdn.tailwindcss.com" type="text/javascript"></script>
+ </head>
+ <body>
+  <div class="container"><!-- Login Page -->
+   <div id="loginPage" class="page active">
+    <div class="card">
+     <h1 class="main-title" id="gameTitle">✨ FUNCTION DASH – Cepat, Tepat, Kuasai Fungsi! ✨</h1>
+     <p class="subtitle" id="welcomeMessage">🎮 Game Edukasi Matematika untuk Siswa SMP Kelas VIII 📘</p>
+     <form id="loginForm">
+      <div class="form-group"><label for="playerName" class="form-label">📝 Nama Lengkap</label> <input type="text" id="playerName" class="form-input" placeholder="Masukkan nama lengkap kamu" required>
+      </div>
+      <div class="form-group"><label class="form-label">🏃‍♂ Pilihan Karakter</label>
+       <div class="gender-options">
+        <div class="gender-option" data-value="female">
+         <div class="gender-avatar">
+          🏃‍♀
+         </div>
+         <div style="font-weight: 700; font-size: 1.1rem;">
+          Perempuan
+         </div><input type="radio" name="gender" value="female" style="display: none;">
+        </div>
+        <div class="gender-option" data-value="male">
+         <div class="gender-avatar">
+          🏃‍♂
+         </div>
+         <div style="font-weight: 700; font-size: 1.1rem;">
+          Laki-laki
+         </div><input type="radio" name="gender" value="male" style="display: none;">
+        </div>
+       </div>
+      </div><button type="submit" class="btn btn-primary" style="width: 100%; margin-top: 35px;"> <span id="loginBtnText">Bermain ▶</span> <span id="loginLoading" class="loading" style="display: none;"></span> </button>
+     </form>
+    </div>
+   </div><!-- Profile Page -->
+   <div id="profilePage" class="page">
+    <div class="card">
+     <h2 class="main-title">Profil Pemain 👤</h2>
+     <div class="profile-section">
+      <div class="profile-avatar" id="playerAvatar">
+       🏃‍♂
+      </div>
+      <div class="profile-info">
+       <h2 id="profileName">Nama Pemain</h2>
+       <p style="font-size: 1.3rem; color: #4A5568; font-weight: 600;">Siap untuk bermain Function Dash! 🚀</p>
+      </div>
+     </div>
+     <div class="profile-stats">
+      <div class="stat-card">
+       <h3 style="font-size: 1.4rem; margin-bottom: 15px;">⭐ Total Skor</h3>
+       <p style="font-size: 2.5rem; font-weight: 900; color: #4299E1; margin: 0;"><span id="totalScore">0</span></p>
+      </div>
+      <div class="stat-card">
+       <h3 style="font-size: 1.4rem; margin-bottom: 15px;">🏆 Skor Tertinggi</h3>
+       <p style="font-size: 2.5rem; font-weight: 900; color: #ED64A6; margin: 0;"><span id="highestScore">0</span></p>
+      </div>
+      <div class="stat-card">
+       <h3 style="font-size: 1.4rem; margin-bottom: 15px;">🎮 Game Dimainkan</h3>
+       <p style="font-size: 2.5rem; font-weight: 900; color: #48BB78; margin: 0;"><span id="gamesPlayed">0</span></p>
+      </div>
+     </div>
+     <div class="btn-group"><button class="btn btn-secondary" onclick="editProfile()">Edit Profil ✏</button> <button class="btn btn-warning" onclick="changeAccount()">Ganti Akun 🔁</button> <button class="btn btn-danger" onclick="logout()">Keluar 🚪</button> <button class="btn btn-success" onclick="showLevelSelect()">Bermain Function Dash ▶</button>
+     </div>
+    </div>
+   </div><!-- Level Select Page -->
+   <div id="levelSelectPage" class="page">
+    <div class="card">
+     <h2 class="main-title">Pilih Level 🎯</h2>
+     <p class="subtitle">Pilih tingkat kesulitan yang sesuai dengan kemampuanmu!</p>
+     <div class="level-selection">
+      <div class="level-card easy" onclick="startGame('easy')">
+       <div class="level-icon">
+        🟢
+       </div>
+       <h3 style="font-size: 2.2rem; margin: 20px 0; font-weight: 800;">EASY</h3>
+       <h4 style="color: #48BB78; margin: 15px 0; font-size: 1.4rem;">Fungsi Linear</h4>
+       <p style="font-size: 1.1rem; margin: 10px 0;">⏱ 10 detik per soal</p>
+       <p style="font-size: 1.1rem; margin: 10px 0;">🏆 +10 poin per jawaban benar</p>
+       <p style="font-style: italic; color: #4A5568; font-size: 1rem;">📝 Contoh: f(x) = 2x</p><button class="btn btn-success" style="margin-top: 25px; width: 100%;">Bermain! 🚀</button>
+      </div>
+      <div class="level-card medium" onclick="startGame('medium')">
+       <div class="level-icon">
+        🟡
+       </div>
+       <h3 style="font-size: 2.2rem; margin: 20px 0; font-weight: 800;">MEDIUM</h3>
+       <h4 style="color: #ECC94B; margin: 15px 0; font-size: 1.4rem;">Fungsi Kuadrat</h4>
+       <p style="font-size: 1.1rem; margin: 10px 0;">⏱ 20 detik per soal</p>
+       <p style="font-size: 1.1rem; margin: 10px 0;">🏆 +20 poin per jawaban benar</p>
+       <p style="font-style: italic; color: #4A5568; font-size: 1rem;">📝 Contoh: f(x) = x² + 2</p><button class="btn btn-warning" style="margin-top: 25px; width: 100%;">Bermain! 🚀</button>
+      </div>
+      <div class="level-card hard" onclick="startGame('hard')">
+       <div class="level-icon">
+        🔴
+       </div>
+       <h3 style="font-size: 2.2rem; margin: 20px 0; font-weight: 800;">HARD</h3>
+       <h4 style="color: #F56565; margin: 15px 0; font-size: 1.4rem;">Fungsi Campuran</h4>
+       <p style="font-size: 1.1rem; margin: 10px 0;">⏱ 30 detik per soal</p>
+       <p style="font-size: 1.1rem; margin: 10px 0;">🏆 +30 poin per jawaban benar</p>
+       <p style="font-style: italic; color: #4A5568; font-size: 1rem;">📝 Contoh: f(x) = 2x² + 5x - 3</p><button class="btn btn-danger" style="margin-top: 25px; width: 100%;">Bermain! 🚀</button>
+      </div>
+     </div>
+     <div style="text-align: center;"><button class="btn btn-secondary" onclick="showProfile()">Kembali 🔙</button>
+     </div>
+    </div>
+   </div><!-- Game Page -->
+   <div id="gamePage" class="page">
+    <div class="game-container">
+     <div class="game-header">
+      <div class="game-stats">
+       <div class="stat-item">
+        Level: <span id="currentLevel">Easy</span>
+       </div>
+       <div class="stat-item timer">
+        ⏱ <span id="timer">10</span>s
+       </div>
+       <div class="stat-item">
+        🏆 <span id="currentScore">0</span>
+       </div>
+       <div class="stat-item">
+        Soal: <span id="questionNumber">1</span>/10
+       </div>
+      </div>
+     </div>
+     <div class="race-track">
+      <div class="track-lines"></div>
+      <div class="start-finish-area">
+       <div class="finish-line"></div>
+       <div class="runner" id="runner">
+        🏃‍♂
+       </div>
+       <div class="start-line"></div>
+      </div>
+     </div>
+     <div class="question-panel">
+      <div class="question-text" id="questionText">
+       Hitunglah nilai f(x) = 2x untuk x = 5
+      </div>
+      <div class="answer-options">
+       <div class="answer-option" onclick="selectAnswer('A')">
+        <div class="option-label">
+         Jalur A
+        </div>
+        <div class="option-value" id="answerA">
+         8
+        </div>
+       </div>
+       <div class="answer-option" onclick="selectAnswer('B')">
+        <div class="option-label">
+         Jalur B
+        </div>
+        <div class="option-value" id="answerB">
+         10
+        </div>
+       </div>
+       <div class="answer-option" onclick="selectAnswer('C')">
+        <div class="option-label">
+         Jalur C
+        </div>
+        <div class="option-value" id="answerC">
+         12
+        </div>
+       </div>
+      </div>
+     </div>
+    </div>
+    <div style="text-align: center;"><button class="btn btn-secondary" onclick="quitGame()">Keluar Game 🚪</button>
+    </div>
+   </div><!-- Results Page -->
+   <div id="resultsPage" class="page">
+    <div class="results-container">
+     <h2 class="results-title" id="finishMessage">Selamat! Kamu berhasil!</h2>
+     <div class="results-stats">
+      <div class="result-stat">
+       <h3 style="font-size: 1.5rem; margin-bottom: 15px;">🏆 Total Skor</h3>
+       <p style="font-size: 3rem; font-weight: 900; color: #4299E1; margin: 0;"><span id="finalScore">0</span></p>
+      </div>
+      <div class="result-stat">
+       <h3 style="font-size: 1.5rem; margin-bottom: 15px;">✅ Jumlah Benar</h3>
+       <p style="font-size: 3rem; font-weight: 900; color: #48BB78; margin: 0;"><span id="correctAnswers">0</span>/10</p>
+      </div>
+      <div class="result-stat">
+       <h3 style="font-size: 1.5rem; margin-bottom: 15px;">📊 Persentase Benar</h3>
+       <p style="font-size: 3rem; font-weight: 900; color: #ED64A6; margin: 0;"><span id="correctPercentage">0%</span></p>
+      </div>
+     </div>
+     <h3 id="resultMessage" style="font-size: 2.2rem; margin: 40px 0; color: #2D3748; font-weight: 700;">Semangat! Kamu pasti bisa lebih baik! 🚀</h3>
+     <div class="btn-group"><button class="btn btn-success" onclick="playAgain()">Main Lagi 🔁</button> <button class="btn btn-primary" onclick="showProfile()">Kembali ke Menu 🔙</button>
+     </div>
+    </div>
+   </div>
+  </div><!-- Feedback Popup -->
+  <div id="feedbackPopup" class="feedback-popup"></div><!-- Confetti Container -->
+  <div id="confettiContainer" class="confetti-container"></div>
+  <script>
+        // Game Questions Database with exact answers as specified
+        const gameQuestions = {
+            easy: [
+                { question: "f(x) = 2x, x = 5", correct: 10, options: [8, 10, 12] },
+                { question: "f(x) = x + 3, x = 4", correct: 7, options: [5, 7, 9] },
+                { question: "f(x) = 3x - 1, x = 3", correct: 8, options: [6, 8, 10] },
+                { question: "f(x) = 5x, x = 2", correct: 10, options: [8, 10, 12] },
+                { question: "f(x) = x - 6, x = 12", correct: 6, options: [4, 6, 8] },
+                { question: "f(x) = 4x + 2, x = 1", correct: 6, options: [4, 6, 8] },
+                { question: "f(x) = x + 10, x = 0", correct: 10, options: [8, 10, 12] },
+                { question: "f(x) = 2x - 3, x = 9", correct: 15, options: [13, 15, 17] },
+                { question: "f(x) = 7x, x = 1", correct: 7, options: [5, 7, 9] },
+                { question: "f(x) = x - 2, x = 9", correct: 7, options: [5, 7, 9] }
+            ],
+            medium: [
+                { question: "f(x) = x² + 2, x = 3", correct: 11, options: [9, 11, 13] },
+                { question: "f(x) = 2x², x = 2", correct: 8, options: [6, 8, 10] },
+                { question: "f(x) = x² - 1, x = 5", correct: 24, options: [22, 24, 26] },
+                { question: "f(x) = 3x² + 2, x = 2", correct: 14, options: [12, 14, 16] },
+                { question: "f(x) = (x + 1)², x = 4", correct: 25, options: [23, 25, 27] },
+                { question: "f(x) = x² + 4x, x = 3", correct: 21, options: [19, 21, 23] },
+                { question: "f(x) = 2x² - 3, x = 4", correct: 29, options: [27, 29, 31] },
+                { question: "f(x) = x² + 6, x = 1", correct: 7, options: [5, 7, 9] },
+                { question: "f(x) = 4x² - 2, x = 3", correct: 34, options: [32, 34, 36] },
+                { question: "f(x) = x² + x, x = 6", correct: 42, options: [40, 42, 44] }
+            ],
+            hard: [
+                { question: "f(x) = 2x² + 5x - 3, x = 3", correct: 30, options: [28, 30, 32] },
+                { question: "f(x) = x² - 4x + 4, x = 7", correct: 25, options: [23, 25, 27] },
+                { question: "f(x) = 3x² + x - 2, x = 2", correct: 12, options: [10, 12, 14] },
+                { question: "f(x) = 4x² - x, x = 5", correct: 95, options: [93, 95, 97] },
+                { question: "f(x) = 5x² - 3x + 1, x = 4", correct: 73, options: [71, 73, 75] },
+                { question: "f(x) = 2(x + 3)² - 1, x = 3", correct: 71, options: [69, 71, 73] },
+                { question: "f(x) = x² + 8x + 12, x = 4", correct: 60, options: [58, 60, 62] },
+                { question: "f(x) = 6x² - x + 2, x = 3", correct: 53, options: [51, 53, 55] },
+                { question: "f(x) = 2x² + 2x, x = 6", correct: 84, options: [82, 84, 86] },
+                { question: "f(x) = x² + 3x - 10, x = 8", correct: 78, options: [76, 78, 80] }
+            ]
+        };
+
+        // Game State
+        let currentPlayer = null;
+        let gameState = {
+            level: '',
+            questions: [],
+            currentQuestionIndex: 0,
+            score: 0,
+            correctAnswers: 0,
+            timer: 0,
+            timerInterval: null,
+            runnerPosition: 70,
+            isAnswering: false,
+            totalSteps: 10,
+            stepSize: 0,
+            gameplayAudio: null,
+            isAudioPlaying: false
+        };
+
+        // Audio Context for Sound Effects
+        let audioContext = null;
+        let isAudioEnabled = false;
+
+        // Data SDK Handler
+        const dataHandler = {
+            onDataChanged(data) {
+                if (data.length > 0 && currentPlayer) {
+                    const playerData = data.find(p => 
+                        p.player_name === currentPlayer.player_name && 
+                        p.gender === currentPlayer.gender
+                    );
+                    if (playerData) {
+                        currentPlayer = playerData;
+                        updateProfileDisplay();
+                    }
+                }
+            }
+        };
+
+        // Element SDK Configuration
+        const defaultConfig = {
+            game_title: "✨ FUNCTION DASH – Cepat, Tepat, Kuasai Fungsi! ✨",
+            welcome_message: "🎮 Game Edukasi Matematika untuk Siswa SMP Kelas VIII 📘",
+            finish_message: "Selamat! Kamu berhasil!"
+        };
+
+        async function onConfigChange(config) {
+            const gameTitle = config.game_title || defaultConfig.game_title;
+            const welcomeMessage = config.welcome_message || defaultConfig.welcome_message;
+            const finishMessage = config.finish_message || defaultConfig.finish_message;
+            
+            document.getElementById('gameTitle').textContent = gameTitle;
+            document.getElementById('welcomeMessage').textContent = welcomeMessage;
+            document.getElementById('finishMessage').textContent = finishMessage;
+        }
+
+        function mapToCapabilities(config) {
+            return {
+                recolorables: [],
+                borderables: [],
+                fontEditable: undefined,
+                fontSizeable: undefined
+            };
+        }
+
+        function mapToEditPanelValues(config) {
+            return new Map([
+                ["game_title", config.game_title || defaultConfig.game_title],
+                ["welcome_message", config.welcome_message || defaultConfig.welcome_message],
+                ["finish_message", config.finish_message || defaultConfig.finish_message]
+            ]);
+        }
+
+        // Initialize Application
+        async function initializeApp() {
+            try {
+                const dataResult = await window.dataSdk.init(dataHandler);
+                if (!dataResult.isOk) {
+                    console.error("Failed to initialize data SDK");
+                }
+
+                if (window.elementSdk) {
+                    await window.elementSdk.init({
+                        defaultConfig,
+                        onConfigChange,
+                        mapToCapabilities,
+                        mapToEditPanelValues
+                    });
+                }
+
+                initializeAudio();
+            } catch (error) {
+                console.error("Failed to initialize SDKs:", error);
+            }
+        }
+
+        // Audio Functions
+        function initializeAudio() {
+            try {
+                audioContext = new (window.AudioContext || window.webkitAudioContext)();
+                isAudioEnabled = true;
+            } catch (error) {
+                console.log("Audio not supported");
+                isAudioEnabled = false;
+            }
+        }
+
+        function playSound(frequency, duration, type = 'sine', volume = 0.1) {
+            if (!isAudioEnabled || !audioContext) return;
+            
+            try {
+                const oscillator = audioContext.createOscillator();
+                const gainNode = audioContext.createGain();
+                
+                oscillator.connect(gainNode);
+                gainNode.connect(audioContext.destination);
+                
+                oscillator.frequency.setValueAtTime(frequency, audioContext.currentTime);
+                oscillator.type = type;
+                
+                gainNode.gain.setValueAtTime(volume, audioContext.currentTime);
+                gainNode.gain.exponentialRampToValueAtTime(0.01, audioContext.currentTime + duration);
+                
+                oscillator.start(audioContext.currentTime);
+                oscillator.stop(audioContext.currentTime + duration);
+            } catch (error) {
+                console.log("Sound playback failed");
+            }
+        }
+
+        function playCorrectSound() {
+            playSound(523.25, 0.4); // C5 note
+            setTimeout(() => playSound(659.25, 0.4), 200); // E5 note
+            setTimeout(() => playSound(783.99, 0.4), 400); // G5 note
+        }
+
+        function playIncorrectSound() {
+            playSound(220, 0.6, 'sawtooth', 0.15); // Lower frequency buzz
+        }
+
+        function playClickSound() {
+            playSound(440, 0.15, 'sine', 0.08); // A4 note
+        }
+
+        function startGameplayMusic() {
+            if (!isAudioEnabled || !audioContext || gameState.isAudioPlaying) return;
+            
+            gameState.isAudioPlaying = true;
+            playGameplayLoop();
+        }
+
+        function playGameplayLoop() {
+            if (!gameState.isAudioPlaying) return;
+            
+            // Simple melody loop
+            const melody = [261.63, 293.66, 329.63, 349.23]; // C-D-E-F
+            let noteIndex = 0;
+            
+            const playNextNote = () => {
+                if (!gameState.isAudioPlaying) return;
+                
+                playSound(melody[noteIndex], 0.8, 'sine', 0.05);
+                noteIndex = (noteIndex + 1) % melody.length;
+                
+                setTimeout(playNextNote, 1200);
+            };
+            
+            playNextNote();
+        }
+
+        function stopGameplayMusic() {
+            gameState.isAudioPlaying = false;
+        }
+
+        function playConfettiSound() {
+            // Play a celebratory melody
+            const melody = [523.25, 659.25, 783.99, 1046.50, 1318.51]; // C-E-G-C-E octave
+            melody.forEach((freq, index) => {
+                setTimeout(() => playSound(freq, 0.5, 'sine', 0.12), index * 150);
+            });
+        }
+
+        // Page Navigation
+        function showPage(pageId) {
+            document.querySelectorAll('.page').forEach(page => {
+                page.classList.remove('active');
+            });
+            document.getElementById(pageId).classList.add('active');
+        }
+
+        // Shuffle array function
+        function shuffleArray(array) {
+            const shuffled = [...array];
+            for (let i = shuffled.length - 1; i > 0; i--) {
+                const j = Math.floor(Math.random() * (i + 1));
+                [shuffled[i], shuffled[j]] = [shuffled[j], shuffled[i]];
+            }
+            return shuffled;
+        }
+
+        // Prepare questions with randomized answers
+        function prepareQuestions(level) {
+            const questions = gameQuestions[level].map(q => {
+                const shuffledOptions = shuffleArray(q.options);
+                const correctIndex = shuffledOptions.indexOf(q.correct);
+                const correctLetter = ['A', 'B', 'C'][correctIndex];
+                
+                return {
+                    question: q.question,
+                    answers: {
+                        A: shuffledOptions[0],
+                        B: shuffledOptions[1],
+                        C: shuffledOptions[2]
+                    },
+                    correct: correctLetter
+                };
+            });
+            return questions;
+        }
+
+        // Login Form Handler
+        document.getElementById('loginForm').addEventListener('submit', async function(e) {
+            e.preventDefault();
+            
+            const loginBtn = document.getElementById('loginBtnText');
+            const loading = document.getElementById('loginLoading');
+            
+            loginBtn.style.display = 'none';
+            loading.style.display = 'inline-block';
+            
+            const name = document.getElementById('playerName').value;
+            const gender = document.querySelector('input[name="gender"]:checked')?.value;
+
+            if (!gender) {
+                showFeedback('Pilih karakter terlebih dahulu! 🏃‍♂', 'incorrect');
+                loginBtn.style.display = 'inline';
+                loading.style.display = 'none';
+                return;
+            }
+
+            currentPlayer = {
+                player_name: name,
+                gender: gender,
+                total_score: 0,
+                highest_score: 0,
+                games_played: 0,
+                created_at: new Date().toISOString()
+            };
+
+            try {
+                const result = await window.dataSdk.create(currentPlayer);
+                if (result.isOk) {
+                    playClickSound();
+                    updateProfileDisplay();
+                    showProfile();
+                } else {
+                    showFeedback('Gagal menyimpan data pemain 😞', 'incorrect');
+                }
+            } catch (error) {
+                showFeedback('Terjadi kesalahan, coba lagi 🔄', 'incorrect');
+            }
+            
+            loginBtn.style.display = 'inline';
+            loading.style.display = 'none';
+        });
+
+        // Gender Selection Handler
+        document.querySelectorAll('.gender-option').forEach(option => {
+            option.addEventListener('click', function() {
+                playClickSound();
+                const radioInput = this.querySelector('input[type="radio"]');
+                radioInput.checked = true;
+                
+                document.querySelectorAll('.gender-option').forEach(opt => {
+                    opt.classList.remove('selected');
+                });
+                this.classList.add('selected');
+            });
+        });
+
+        // Profile Functions
+        function updateProfileDisplay() {
+            if (!currentPlayer) return;
+            
+            const avatar = currentPlayer.gender === 'male' ? '🏃‍♂' : '🏃‍♀';
+            document.getElementById('playerAvatar').textContent = avatar;
+            document.getElementById('profileName').textContent = currentPlayer.player_name;
+            document.getElementById('totalScore').textContent = currentPlayer.total_score || 0;
+            document.getElementById('highestScore').textContent = currentPlayer.highest_score || 0;
+            document.getElementById('gamesPlayed').textContent = currentPlayer.games_played || 0;
+        }
+
+        function showProfile() {
+            stopGameplayMusic();
+            showPage('profilePage');
+        }
+
+        function showLevelSelect() {
+            playClickSound();
+            showPage('levelSelectPage');
+        }
+
+        function editProfile() {
+            playClickSound();
+            showPage('loginPage');
+        }
+
+        function changeAccount() {
+            playClickSound();
+            currentPlayer = null;
+            document.getElementById('playerName').value = '';
+            document.querySelectorAll('.gender-option').forEach(opt => {
+                opt.classList.remove('selected');
+            });
+            document.querySelectorAll('input[name="gender"]').forEach(input => {
+                input.checked = false;
+            });
+            showPage('loginPage');
+        }
+
+        function logout() {
+            playClickSound();
+            currentPlayer = null;
+            showPage('loginPage');
+        }
+
+        // Game Functions
+        function startGame(level) {
+            playClickSound();
+            
+            gameState.level = level;
+            gameState.questions = prepareQuestions(level);
+            gameState.currentQuestionIndex = 0;
+            gameState.score = 0;
+            gameState.correctAnswers = 0;
+            gameState.runnerPosition = 70;
+            gameState.isAnswering = false;
+            gameState.totalSteps = 10;
+            
+            // Calculate step size for runner movement (from start to finish)
+            // Track width minus margins for start/finish lines
+            const trackWidth = 800; // Approximate track width
+            gameState.stepSize = (trackWidth - 140) / gameState.totalSteps;
+            
+            // Set runner appearance based on gender
+            const runner = document.getElementById('runner');
+            runner.textContent = currentPlayer.gender === 'male' ? '🏃‍♂' : '🏃‍♀';
+            
+            showPage('gamePage');
+            updateGameDisplay();
+            startTimer();
+            startGameplayMusic();
+        }
+
+        function updateGameDisplay() {
+            const question = gameState.questions[gameState.currentQuestionIndex];
+            
+            document.getElementById('currentLevel').textContent = 
+                gameState.level.charAt(0).toUpperCase() + gameState.level.slice(1);
+            document.getElementById('currentScore').textContent = gameState.score;
+            document.getElementById('questionNumber').textContent = gameState.currentQuestionIndex + 1;
+            document.getElementById('questionText').textContent = Hitunglah nilai ${question.question};
+            document.getElementById('answerA').textContent = question.answers.A;
+            document.getElementById('answerB').textContent = question.answers.B;
+            document.getElementById('answerC').textContent = question.answers.C;
+            
+            // Reset answer options
+            document.querySelectorAll('.answer-option').forEach(option => {
+                option.classList.remove('correct', 'incorrect', 'disabled');
+            });
+            
+            // Update runner position
+            const runner = document.getElementById('runner');
+            runner.style.right = gameState.runnerPosition + 'px';
+            runner.classList.remove('running', 'jumping', 'stumbling');
+        }
+
+        function startTimer() {
+            const timers = { easy: 10, medium: 20, hard: 30 };
+            gameState.timer = timers[gameState.level];
+            
+            document.getElementById('timer').textContent = gameState.timer;
+            
+            gameState.timerInterval = setInterval(() => {
+                gameState.timer--;
+                document.getElementById('timer').textContent = gameState.timer;
+                
+                if (gameState.timer <= 0) {
+                    clearInterval(gameState.timerInterval);
+                    if (!gameState.isAnswering) {
+                        selectAnswer(''); // Time's up
+                    }
+                }
+            }, 1000);
+        }
+
+        function selectAnswer(selectedOption) {
+            if (gameState.isAnswering) return;
+            
+            gameState.isAnswering = true;
+            clearInterval(gameState.timerInterval);
+            
+            const question = gameState.questions[gameState.currentQuestionIndex];
+            const isCorrect = selectedOption === question.correct;
+            const runner = document.getElementById('runner');
+            
+            // Disable all options
+            document.querySelectorAll('.answer-option').forEach(option => {
+                option.classList.add('disabled');
+            });
+            
+            if (isCorrect && selectedOption) {
+                // Correct answer
+                playCorrectSound();
+                showFeedback('Hebat! 🌟', 'correct');
+                gameState.correctAnswers++;
+                
+                // Update score
+                const points = { easy: 10, medium: 20, hard: 30 };
+                gameState.score += points[gameState.level];
+                
+                // Move runner forward (to the left)
+                gameState.runnerPosition += gameState.stepSize;
+                runner.classList.add('running', 'jumping');
+                
+                // Highlight correct answer
+                const optionIndex = { A: 0, B: 1, C: 2 }[selectedOption];
+                document.querySelectorAll('.answer-option')[optionIndex].classList.add('correct');
+                
+            } else {
+                // Wrong answer or time's up
+                playIncorrectSound();
+                if (selectedOption) {
+                    showFeedback('Coba lagi!', 'incorrect');
+                    const optionIndex = { A: 0, B: 1, C: 2 }[selectedOption];
+                    document.querySelectorAll('.answer-option')[optionIndex].classList.add('incorrect');
+                } else {
+                    showFeedback('Waktu habis! ⏰', 'incorrect');
+                }
+                
+                runner.classList.add('stumbling');
+            }
+            
+            // Update display
+            updateGameDisplay();
+            
+            // Move to next question
+            setTimeout(() => {
+                gameState.currentQuestionIndex++;
+                gameState.isAnswering = false;
+                
+                if (gameState.currentQuestionIndex >= gameState.questions.length) {
+                    endGame();
+                } else {
+                    updateGameDisplay();
+                    startTimer();
+                }
+            }, 2800);
+        }
+
+        async function endGame() {
+            stopGameplayMusic();
+            
+            // Update player statistics
+            if (currentPlayer) {
+                currentPlayer.total_score = (currentPlayer.total_score || 0) + gameState.score;
+                currentPlayer.highest_score = Math.max(currentPlayer.highest_score || 0, gameState.score);
+                currentPlayer.games_played = (currentPlayer.games_played || 0) + 1;
+                
+                try {
+                    const result = await window.dataSdk.update(currentPlayer);
+                    if (!result.isOk) {
+                        console.error("Failed to update player stats");
+                    }
+                } catch (error) {
+                    console.error("Error updating player stats:", error);
+                }
+            }
+            
+            showResults();
+        }
+
+        function showResults() {
+            const percentage = Math.round((gameState.correctAnswers / gameState.questions.length) * 100);
+            
+            document.getElementById('finalScore').textContent = gameState.score;
+            document.getElementById('correctAnswers').textContent = gameState.correctAnswers;
+            document.getElementById('correctPercentage').textContent = percentage + '%';
+            
+            let message = '';
+            if (percentage >= 80) {
+                message = 'Kamu jago banget hari ini! 🌟';
+                showConfetti();
+                playConfettiSound();
+            } else if (percentage >= 50) {
+                message = 'Keren, terus berlatih ya! 💪';
+            } else {
+                message = 'Semangat! Kamu pasti bisa lebih baik! 🚀';
+            }
+            
+            document.getElementById('resultMessage').textContent = message;
+            showPage('resultsPage');
+        }
+
+        function showFeedback(message, type) {
+            const feedback = document.getElementById('feedbackPopup');
+            feedback.textContent = message;
+            feedback.className = feedback-popup ${type};
+            feedback.style.display = 'block';
+            
+            setTimeout(() => {
+                feedback.style.display = 'none';
+            }, 2500);
+        }
+
+        function showConfetti() {
+            const container = document.getElementById('confettiContainer');
+            container.innerHTML = '';
+            
+            const colors = ['#FFD6EC', '#B8E8FC', '#FFF5B8', '#C6F6D5', '#FEEBC8', '#E6FFFA'];
+            
+            for (let i = 0; i < 150; i++) {
+                const piece = document.createElement('div');
+                piece.className = 'confetti-piece';
+                piece.style.left = Math.random() * 100 + '%';
+                piece.style.animationDelay = Math.random() * 5 + 's';
+                piece.style.backgroundColor = colors[Math.floor(Math.random() * colors.length)];
+                piece.style.animationDuration = (4 + Math.random() * 3) + 's';
+                container.appendChild(piece);
+            }
+            
+            setTimeout(() => {
+                container.innerHTML = '';
+            }, 8000);
+        }
+
+        function playAgain() {
+            playClickSound();
+            startGame(gameState.level);
+        }
+
+        function quitGame() {
+            playClickSound();
+            clearInterval(gameState.timerInterval);
+            stopGameplayMusic();
+            showLevelSelect();
+        }
+
+        // Add click sound to all buttons
+        document.addEventListener('click', function(e) {
+            if (e.target.classList.contains('btn') || e.target.classList.contains('answer-option') || e.target.classList.contains('level-card')) {
+                playClickSound();
+            }
+        });
+
+        // Initialize app when page loads
+        document.addEventListener('DOMContentLoaded', initializeApp);
+    </script>
+ <script>(function(){function c(){var b=a.contentDocument||a.contentWindow.document;if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'99e7da80a6cefd0f',t:'MTc2MzEzNzQwOC4wMDAwMDA='};var a=document.createElement('script');a.nonce='';a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script></body>
+</html>
