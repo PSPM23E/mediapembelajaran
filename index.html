@@ -71,14 +71,27 @@ height:700px !important;
 transform:scale(0.7);
 transform-origin: top center;
 }
-     .hud {
-    transform: translateX(-50%) scale(0.85);
-    transform-origin: top center;
-}
+   /* kecilkan canvas saja */
 #game {
     transform: scale(0.85);
     transform-origin: top center;
 }
+
+/* HUD jangan ikut kecil → posisikan ulang agar pas */
+.hud {
+    position: absolute;
+    left: 50%;
+    transform: translateX(-50%);
+    top: -5px;        /* HUD dinaikkan sedikit */
+    width: 640px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    pointer-events: none;
+    z-index: 50;      /* pastikan HUD berada di atas canvas */
+}
+
   </style>
 </head>
 <body>
