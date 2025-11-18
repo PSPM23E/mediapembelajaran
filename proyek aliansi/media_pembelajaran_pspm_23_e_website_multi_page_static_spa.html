@@ -1,0 +1,272 @@
+<!--
+Media Pembelajaran PSPM 23 E
+Static multi-page feel (single HTML file acting as multi-page SPA)
+How to use:
+1. Save this file as `index.html` in a folder.
+2. Add local media (HTML/CSS/JS) under a subfolder `media/` (e.g. `media/pytha-climb/index.html`).
+3. Edit the `mediaList` array in the script section to add/remove media entries.
+   Each entry: { id, title, authors, type: 'embed'|'external', src, thumb, description }
+   - type 'embed' => src points to a relative path (e.g. "media/pytha-climb/index.html") and will be shown in an iframe.
+   - type 'external' => src is an absolute URL and will open in a new tab.
+4. To run locally, serve with a static server (recommended):
+   - Python 3: `python -m http.server` and open http://localhost:8000
+   - Or open `index.html` directly (embedding local files via iframe may be blocked by some browsers if opened via file://; use a local server if you see issues).
+
+Features included:
+- Gallery of media cards (search + filter by type)
+- Detail "page" for each media (simulated multi-page via URL hash, e.g. #/media/pytha-climb)
+- Viewer area: iframe embedding for local HTML media, or link button for external media
+- Simple responsive layout and light styling
+- Manifest array at bottom for easy editing
+-->
+
+<!doctype html>
+<html lang="id">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Media Pembelajaran PSPM 23 E</title>
+  <style>
+    :root{--accent:#2b6cb0;--card:#fff;--muted:#666}
+    *{box-sizing:border-box}
+    body{font-family:Inter, system-ui, -apple-system, 'Segoe UI', Roboto, 'Helvetica Neue', Arial; margin:0; background:#f4f7fb; color:#0b1220}
+    header{background:linear-gradient(90deg,#fff 0%, #f7fbff 100%); padding:18px 24px; display:flex; align-items:center; gap:16px; box-shadow:0 1px 0 rgba(10,10,10,0.04)}
+    .brand{display:flex; gap:12px; align-items:center}
+    .logo{width:56px; height:56px; background:var(--accent); color:white; display:flex; align-items:center; justify-content:center; border-radius:8px; font-weight:700}
+    h1{font-size:18px; margin:0}
+    .subtitle{font-size:13px; color:var(--muted)}
+    main{padding:20px; max-width:1100px; margin:20px auto}
+
+    .controls{display:flex; gap:12px; align-items:center; margin-bottom:16px}
+    .search{flex:1}
+    input[type=text]{width:100%; padding:10px 12px; border-radius:8px; border:1px solid #e2e8f0}
+    select{padding:10px; border-radius:8px; border:1px solid #e2e8f0}
+
+    .grid{display:grid; grid-template-columns:repeat(auto-fill,minmax(240px,1fr)); gap:14px}
+    .card{background:var(--card); border-radius:12px; padding:12px; box-shadow:0 6px 18px rgba(14,30,37,0.06); display:flex; flex-direction:column; min-height:140px}
+    .thumb{height:120px; border-radius:8px; background:#e6edf7; display:flex; align-items:center; justify-content:center; margin-bottom:10px; overflow:hidden}
+    .thumb img{width:100%; height:100%; object-fit:cover}
+    .meta{flex:1}
+    .title{font-weight:600; font-size:15px; margin:0 0 6px}
+    .small{font-size:13px; color:var(--muted)}
+    .btn{display:inline-block; padding:8px 12px; border-radius:8px; text-decoration:none; background:var(--accent); color:white; font-weight:600; margin-top:8px}
+
+    /* detail / viewer */
+    .viewer{background:#fff; border-radius:12px; padding:12px; box-shadow:0 6px 18px rgba(14,30,37,0.06); margin-top:14px}
+    .viewer-header{display:flex; justify-content:space-between; gap:12px; align-items:center}
+    .iframe-wrap{height:600px; border-radius:8px; overflow:hidden; margin-top:12px}
+    .iframe-wrap iframe{width:100%; height:100%; border:0}
+
+    footer{max-width:1100px; margin:20px auto; color:var(--muted); font-size:13px}
+
+    @media (max-width:720px){.iframe-wrap{height:420px}}
+  </style>
+</head>
+<body>
+  <header>
+    <div class="brand">
+      <div class="logo">
+  <img src="logo-math.jpg" alt="Logo Matematika" style="width:100%; height:100%; object-fit:cover; border-radius:8px;">
+</div>
+
+      <div>
+        <h1>Media Pembelajaran PSPM 23 E</h1>
+        <div class="subtitle">Kumpulan media pembelajaran yang dibuat oleh kelas PSPM 23E</div>
+      </div>
+    </div>
+  </header>
+
+  <main>
+    <div id="list-view">
+      <div class="controls">
+        <div class="search"><input id="q" type="text" placeholder="Cari media (judul, pengarang, kata kunci)..." /></div>
+        <div>
+          <select id="typeFilter">
+            <option value="all">Semua tipe</option>
+            <option value="embed">Embed (bisa tampil di dalam situs)</option>
+            <option value="external">External (link ke luar)</option>
+          </select>
+        </div>
+        
+      </div>
+
+      <div id="grid" class="grid"></div>
+    </div>
+
+    <div id="detail-view" style="display:none">
+      <a href="#/" class="btn" style="background:#718096; margin-bottom:10px; display:inline-block">← Kembali ke Galeri</a>
+      <div class="viewer">
+        <div class="viewer-header">
+          <div>
+            <h2 id="detail-title" style="margin:0">Judul</h2>
+            <div id="detail-authors" class="small">Pengarang</div>
+          </div>
+          <div>
+            <a id="open-external" class="btn" style="display:none" target="_blank" rel="noopener">Buka di tab baru</a>
+          </div>
+          
+        </div>
+        <p id="detail-desc" class="small" style="margin-top:8px"></p>
+        <div id="viewer-area" class="iframe-wrap" style="display:none">
+        <iframe id="viewer-iframe" allowfullscreen sandbox="allow-scripts allow-same-origin"></iframe>
+
+        </div>
+      </div>
+    </div>
+
+  </main>
+
+  <footer>
+    &copy; PSPM 23 E — Kumpulan media pembelajaran ini dibuat oleh mahasiswa PSPM 23E Universitas Negeri Medan sebagai proyek pengembangan materi ajar digital. Konten dirancang interaktif dan informatif untuk mendukung proses belajar serta memudahkan pemahaman pengguna.
+  </footer>
+
+  <script>
+    // --- Manifest (edit this array to add your media) ---
+    const mediaList = [
+      {
+        id: 'pytha-climb',
+        title: 'Pytha Climb (Game Interaktif)'
+        ,authors: 'ivan, meity, rifal',
+        type: 'embed',
+        src: 'media/pytha-climb/index.html',
+        thumb: 'media/pytha-climb/thumb.jpg',
+        description: 'Media pembelajaran game Pythagoras — laba laba memanjat kepuncak atas dengan menjawab soal Pythagoras.'
+      },
+      {
+        id: 'flash-card',
+        title: 'flashcard interaktif untuk materi bangun ruang.',
+        authors: 'kelompok najwa dkk',
+        type: 'external',
+        src: 'https://heyzine.com/flip-book/4a78ea2f96.html',
+        thumb: '',
+        description: 'Media pembelajaran ini berupa flashcard interaktif untuk materi bangun ruang. Setiap flashcard dilengkapi kode QR yang, ketika dipindai, menampilkan visualisasi bangun ruang secara jelas dan menarik. Pada bagian akhir, tersedia kode QR tambahan yang mengarahkan pada flipbook digital berisi penjelasan rinci mengenai setiap bangun ruang.Media ini menggabungkan bahan ajar cetak dan teknologi digital untuk meningkatkan pemahaman konsep secara interaktif.'
+      },
+      {
+        id: 'game-edukatif',
+        title: 'bamboozle.',
+        authors: 'kelompok tiara dkk',
+        type: 'external',
+        src: 'https://www.baamboozle.com/game/3812998',
+        thumb: '',
+        description: 'Platform game edukatif yang dimainkan secara tim untuk membuat siswa lebih aktif dalam berdiskusi. Game ini berisikan soal tentang bangun ruang yang akan membuat mereka lebih mengingat tentang bangun ruang dan membuat belajar lebih seru'
+      
+      },
+      {
+        id: 'function-dash',
+        title: 'FUNCTION DASH – Game Edukasi Interaktif Materi Fungsi',
+        authors: 'Afer, Fasya, Jesika',
+        type: 'external',
+        src: 'https://functiondash.my.canva.site/',
+        thumb: '',
+        description: 'FUNCTION DASH merupakan game edukasi interaktif berbasis web untuk siswa SMP kelas VIII. Media ini menggabungkan konsep permainan runner dengan latihan soal fungsi (linear, kuadrat, dan campuran). Siswa memilih karakter, memilih level, kemudian berlari menuju garis finish dengan setiap jawaban soal yang benar. Dilengkapi timer per level, sistem skor otomatis, animasi pelari, efek benar/salah, backsound, serta halaman hasil dengan evaluasi kinerja. Desain pastel ceria dan UI responsif membuat pengalaman belajar menjadi lebih menyenangkan dan memotivasi.'
+      },
+      {
+        id: 'geomath',
+        title: 'geomath',
+        authors: 'Zavira dkk',
+        type: 'embed',
+        src: 'media/geomath/index.html',
+        thumb: '',
+        description: 'geomath'
+      },
+       {
+        id: 'math-detective',
+        title: 'Math Detective',
+        authors: 'Nur Aini dkk',
+        type: 'embed',
+        src: 'media/math-detective/index.html',
+        thumb: '',
+        description: 'Math Detective merupakan media pembelajaran digital interaktif berbasis web yang dirancang untuk mendukung proses belajar matematika melalui pendekatan gamifikasi dan penyelesaian kasus. Media ini menghadirkan pengalaman belajar dalam bentuk permainan detektif, di mana peserta didik berperan sebagai “detektif matematika” yang harus mengungkap pola, memecahkan kasus numerik, dan menyelesaikan misi pada topik matematika kelas VIII.Media ini terdiri atas beberapa tahapan utama, yaitu halaman pengenalan, input identitas, pemilihan misi, penjelasan narasi, dan penyelesaian kasus. Setiap misi mewakili satu materi matematika, seperti bilangan berpangkat, teorema Pythagoras, persamaan linear, pertidaksamaan linear, relasi dan fungsi, persamaan garis lurus, hingga statistika. Setiap misi memuat narasi kontekstual, petunjuk eksplorasi, dan serangkaian kasus yang harus diselesaikan secara mandiri oleh peserta didik.Peserta didik diberikan batasan percobaan (attempts), umpan balik otomatis, serta skor yang diperbarui berdasarkan keberhasilan mereka menjawab kasus. Mekanisme ini mendorong ketekunan, pemecahan masalah, dan evaluasi diri. Media ini dapat digunakan sebagai bahan ajar pendamping, aktivitas literasi numerasi, asesmen formatif, maupun sarana pengayaan. Math Detective dikembangkan untuk memperkuat literasi numerasi, kemampuan berpikir logis, dan pemahaman konsep matematika secara bertahap dan bermakna. Penyajian materi melalui narasi dan permainan memungkinkan peserta didik lebih terlibat secara emosional dan kognitif, sehingga pembelajaran menjadi lebih menarik, kontekstual, dan relevan dengan semangat Kurikulum Merdeka yang menekankan pembelajaran interaktif, adaptif, dan berpusat pada peserta didik.'
+      }
+
+    ];
+
+    // --- Helper functions ---
+    function el(tag, cls){ const e=document.createElement(tag); if(cls) e.className=cls; return e }
+
+    const grid = document.getElementById('grid');
+    const q = document.getElementById('q');
+    const typeFilter = document.getElementById('typeFilter');
+    const detailView = document.getElementById('detail-view');
+    const listView = document.getElementById('list-view');
+    const detailTitle = document.getElementById('detail-title');
+    const detailAuthors = document.getElementById('detail-authors');
+    const detailDesc = document.getElementById('detail-desc');
+    const viewerArea = document.getElementById('viewer-area');
+    const viewerIframe = document.getElementById('viewer-iframe');
+    const openExternal = document.getElementById('open-external');
+
+    function renderGrid(filterText='', filterType='all'){
+      grid.innerHTML = '';
+      const s = filterText.trim().toLowerCase();
+      const list = mediaList.filter(m => {
+        if(filterType !== 'all' && m.type !== filterType) return false;
+        if(!s) return true;
+        return (m.title + ' ' + (m.authors||'') + ' ' + (m.description||'')).toLowerCase().includes(s);
+      });
+      if(list.length===0){ const p = el('div','small'); p.textContent='Tidak ada media sesuai pencarian.'; grid.appendChild(p); return }
+      list.forEach(m => {
+        const c = el('div','card');
+        const th = el('div','thumb');
+        if(m.thumb){ const img = el('img'); img.src = m.thumb; th.appendChild(img) } else { th.textContent = m.type === 'embed' ? 'Embed' : 'Link' }
+        c.appendChild(th);
+        const meta = el('div','meta');
+        const t = el('h3','title'); t.textContent = m.title; meta.appendChild(t);
+        const a = el('div','small'); a.textContent = m.authors || '' ; meta.appendChild(a);
+        const d = el('div','small'); d.textContent = m.description ? (m.description.length>80? m.description.slice(0,80)+'...': m.description) : ''; meta.appendChild(d);
+        c.appendChild(meta);
+        const btn = el('a','btn'); btn.href = `#/media/${m.id}`; btn.textContent = 'Lihat'; c.appendChild(btn);
+        grid.appendChild(c);
+      })
+    }
+
+    function showDetail(id){
+      const m = mediaList.find(x=>x.id===id);
+      if(!m) { location.hash = '#/'; return }
+      listView.style.display='none';
+      detailView.style.display='block';
+      detailTitle.textContent = m.title;
+      detailAuthors.textContent = m.authors || '';
+      detailDesc.textContent = m.description || '';
+
+      if(m.type === 'embed'){
+        viewerArea.style.display = 'block';
+        openExternal.style.display = 'none';
+        // load iframe
+        viewerIframe.src = m.src;
+      } else {
+        viewerArea.style.display = 'none';
+        openExternal.style.display = 'inline-block';
+        openExternal.href = m.src;
+        openExternal.textContent = 'Buka di tab baru';
+      }
+    }
+
+    function hideDetail(){
+      detailView.style.display='none';
+      listView.style.display='block';
+      viewerIframe.src = 'about:blank';
+    }
+
+    // --- events ---
+    q.addEventListener('input', ()=> renderGrid(q.value, typeFilter.value));
+    typeFilter.addEventListener('change', ()=> renderGrid(q.value, typeFilter.value));
+
+    window.addEventListener('hashchange', ()=> handleHash());
+    function handleHash(){
+      const hash = location.hash || '#/';
+      if(hash === '#/' || hash === ''){ hideDetail(); renderGrid(q.value, typeFilter.value); return }
+      const match = hash.match(/^#\/media\/([a-z0-9\-\_]+)/i);
+      if(match){ showDetail(match[1]) } else { hideDetail(); }
+    }
+
+
+    // initial render
+    renderGrid();
+    handleHash();
+
+    // Expose mediaList to window for easy editing in browser console if needed
+    window.__mediaList = mediaList;
+  </script>
+</body>
+</html>

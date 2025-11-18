@@ -1,0 +1,430 @@
+<!doctype html>
+<html lang="id">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1" />
+<title>Pythagoras Climb (Final Levels)</title>
+<style>
+  :root{--muted:#4b5563;--accent:#ff7f50;--panel:#ffffffcc;--hud-bg:rgba(10,20,40,0.12);--coin-gold:#ffcc33}
+  html,body{height:100%;margin:0;font-family:Inter,system-ui,Arial,Helvetica;background:linear-gradient(180deg,#dbeffb,#f3fbff);-webkit-font-smoothing:antialiased}
+  .wrap{max-width:1200px;margin:18px auto;padding:12px}
+  header{display:flex;align-items:center;gap:12px}
+  h1{margin:0;font-size:22px;color:#fff;text-shadow:0 2px 8px rgba(0,0,0,0.25)}
+  .layout{display:flex;gap:16px;margin-top:12px}
+  .scene{flex:1;position:relative}
+  canvas{width:100%;height:620px;border-radius:12px;display:block;background:transparent;box-shadow:0 14px 30px rgba(7,22,45,0.12);border:6px solid rgba(255,255,255,0.08)}
+  .panel{width:420px;background:var(--panel);padding:14px;border-radius:12px;box-shadow:0 8px 20px rgba(0,0,0,0.06)}
+  label{display:block;margin-top:8px;color:var(--muted)}
+  input[type=number], input[type=text]{width:100%;padding:8px;border-radius:8px;border:1px solid #e6eef8;margin-top:6px}
+  .row{display:flex;gap:8px;margin-top:8px}
+  .half{flex:1}
+  button{padding:8px 12px;border-radius:8px;border:0;background:var(--accent);color:#fff;font-weight:700;cursor:pointer}
+  button.secondary{background:#edf2f7;color:#222}
+  .feedback{margin-top:10px;font-weight:700;min-height:28px}
+  .muted{color:var(--muted);font-size:13px}
+  .box{margin-top:8px;padding:10px;border-radius:8px;background:#fbfdff;border:1px solid #eef6fb}
+  .ok{color:green;font-weight:700}
+  .err{color:#b00;font-weight:700}
+  .small{font-size:13px;color:#666}
+  /* start screen */
+  #startScreen{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;z-index:40}
+  #startScreen .bg{position:absolute;inset:0;background-size:cover;background-position:center;filter:brightness(0.75)}
+  #startScreen .overlay{position:absolute;inset:0;background:linear-gradient(180deg,rgba(0,0,0,0.45),rgba(0,0,0,0.55));}
+  #startScreen .content{position:relative;z-index:2;color:#fff;text-align:center;padding:20px}
+  #startScreen h2{font-size:48px;margin:0 0 12px;letter-spacing:2px}
+  #startScreen p{margin:8px 0 18px;color:rgba(255,255,255,0.9)}
+  #startBtn{padding:14px 36px;border-radius:14px;border:none;background:linear-gradient(90deg,#ffd36b,#ff7f50);font-size:20px;cursor:pointer;box-shadow:0 8px 24px rgba(255,127,80,0.25)}
+  #startBtn:active{transform:translateY(1px)}
+  .hidden{display:none}
+  /* formula box styling */
+  .formulaBox{border:1px solid #e6eef8;padding:8px;border-radius:10px;background:#f7fbff;display:flex;gap:8px;flex-wrap:wrap}
+  .formulaBox label{padding:6px 10px;border-radius:8px;cursor:pointer;background:transparent}
+  /* end screen */
+  #endScreen{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;z-index:50;background:rgba(0,0,0,0.6);color:#fff;font-size:28px;flex-direction:column;gap:12px;display:none}
+  #endScreen button{padding:12px 24px;background:#ffd36b;border-radius:10px;border:none}
+  /* HUD */
+  .hud{position:absolute; left:50%; transform:translateX(-50%); top:12px; width:640px;display:flex;align-items:center;justify-content:space-between;gap:12px;pointer-events:none}
+  .hud .left,.hud .right{display:flex;gap:12px;align-items:center}
+  .hud .box{padding:8px 12px;border-radius:10px;background:var(--hud-bg);backdrop-filter: blur(4px);border:1px solid rgba(255,255,255,0.2);color:#fff;font-weight:800;text-shadow:0 1px 1px rgba(0,0,0,0.2)}
+  .progressWrap{flex:1;margin:0 12px;height:12px;border-radius:12px;background:rgba(255,255,255,0.12);overflow:hidden;border:1px solid rgba(0,0,0,0.06)}
+  .progressBar{height:100%;width:0%;background:linear-gradient(90deg,#ffd36b,#ff7f50);box-shadow:0 4px 8px rgba(255,127,80,0.18)}
+</style>
+</head>
+<body>
+  <div class="wrap">
+    <header>
+      <h1>Pythagoras Climb</h1>
+      <div style="margin-left:auto;color:var(--muted)"></div>
+    </header>
+
+    <div class="layout">
+      <div class="scene" style="min-height:620px;position:relative">
+
+        <!-- START SCREEN -->
+        <div id="startScreen">
+          <div class="bg" id="startBg"></div>
+          <div class="overlay"></div>
+          <div class="content">
+            <h2>PYTHA CLIMB</h2>
+            <p>Pelajari teorema Pythagoras sambil memanjat platform! Kumpulkan coin dan selesaikan soal.</p>
+            <button id="startBtn">MULAI PERMAINAN</button>
+          </div>
+        </div>
+
+        <!-- HUD overlay -->
+        <div class="hud" aria-hidden="true">
+          <div class="left">
+            <div class="box" id="hudScore">SCORE: 0000</div>
+            <div class="box" id="hudLevel">LEVEL: 1-1</div>
+          </div>
+
+          <div class="progressWrap" aria-hidden="true">
+            <div class="progressBar" id="progressBar"></div>
+          </div>
+
+          <div class="right">
+            <div class="box" id="hudTimer">TIME: 0:60</div>
+          </div>
+        </div>
+
+        <canvas id="game" width="1100" height="620" style="visibility:hidden;opacity:0;transition:opacity 400ms ease"></canvas>
+
+        <div id="endScreen">
+          <div>Selamat! Kamu berhasil menyelesaikan semua level!</div>
+          <button id="restartBtn">Main Lagi</button>
+        </div>
+
+      </div>  <!-- .scene -->
+
+      <div class="panel" id="sidePanel" style="visibility:hidden;opacity:0;transition:opacity 400ms ease">
+        <div style="display:flex;justify-content:space-between;align-items:center">
+          <div>Level <span id="levelNo">1</span> – Stage <span id="stageNo">1</span></div>
+          <div style="font-size:13px;color:var(--muted)">Status: <strong id="status">Siap</strong></div>
+        </div>
+
+        <label>Soal</label>
+        <div id="soalText" style="color:var(--muted);font-size:14px">(Soal muncul di sini)</div>
+
+        <hr>
+
+        <div class="box" style="background:#fff">
+          <div class="muted">Langkah 1 — Pilih rumus yang akan digunakan</div>
+          <div class="formulaBox" style="margin-top:6px">
+            <label><input type="radio" name="formula" value="c2=b2+a2"> <strong>c² = b² + a²</strong></label>
+            <label><input type="radio" name="formula" value="a2=c2-b2"> <strong>a² = c² - b²</strong></label>
+            <label><input type="radio" name="formula" value="b2=c2-a2"> <strong>b² = c² - a²</strong></label>
+          </div>
+
+          <div class="muted" style="margin-top:10px">Langkah 2 — Isi kuadrat sisi-sisi yang diketahui (urutan boleh tertukar)</div>
+          <div style="display:flex;gap:8px;margin-top:6px">
+            <input type="number" id="sqKnown1" class="half" placeholder="kuadrat sisi 1" disabled>
+            <input type="number" id="sqKnown2" class="half" placeholder="kuadrat sisi 2" disabled>
+          </div>
+          <div class="small" id="sqLabels" style="margin-top:6px">Label sisi akan muncul setelah pilih rumus.</div>
+
+          <div class="muted" style="margin-top:10px">Langkah 3 — Isi hasil operasi (jumlah atau selisih)</div>
+          <input type="number" id="opResult" placeholder="hasil penjumlahan / pengurangan" disabled>
+
+          <div class="muted" style="margin-top:10px">Langkah 4 — Isi akar dari hasil operasi</div>
+          <input type="number" id="finalRoot" placeholder="akar (nilai sisi akhir)" disabled>
+
+          <div class="row" style="margin-top:8px">
+            <button id="stepCheckBtn">Periksa Langkah</button>
+            <button id="stepResetBtn" class="secondary">Ulangi Langkah</button>
+          </div>
+
+          <div id="stepFeedback" class="feedback"></div>
+        </div>
+
+        <div style="margin-top:10px;display:flex;align-items:center;justify-content:space-between">
+          <div class="small">Isi sesuai urutan: rumus → kuadrat sisi → jumlah/selisih → akar.</div>
+          <div style="color:var(--muted)"></div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+<script>
+// ================= ASSET LOADING & LEVEL CONFIG =================
+// audio
+const bgm = new Audio("sound track.mp3"); bgm.loop = true; bgm.volume = 0.45;
+const sfxNaik = new Audio("naik.mp3"); sfxNaik.volume = 1.0;
+const sfxCoin = new Audio("coin.mp3"); sfxCoin.volume = 0.95;
+const sfxSalah = new Audio("salah.mp3"); sfxSalah.volume = 1.0;
+
+// backgrounds (use the exact filenames you uploaded)
+const LEVEL_BGS = [
+  "background_level1.jpg",
+  "background_level2.jpg",
+  "background_level3.jpg"
+];
+const bgImgs = LEVEL_BGS.map(src => { const im = new Image(); im.src = src; im.onload = ()=>{}; return im; });
+
+// portal image (try portal.png fallback to uploaded name)
+const portalImg = new Image(); portalImg.src = "portal.png";
+portalImg.onerror = ()=>{ portalImg.src = "WhatsApp Image 2025-11-18 at 14.11.09_ed9cc72b.png" };
+
+// platform + spider + coin images
+const platformImg = new Image(); platformImg.src = "balok.png";
+const spiderImg = new Image(); spiderImg.src = "spider.png.png";
+
+// LEVELS: 3 levels, each with 5 stages (same structure, different numbers)
+const LEVELS = [
+  { name: 'Level 1', stages: [ {a:3,b:4,c:5},{a:5,b:12,c:13},{a:8,b:15,c:17},{a:7,b:24,c:25},{a:9,b:40,c:41} ] },
+  { name: 'Level 2', stages: [ {a:4,b:3,c:5},{a:6,b:8,c:10},{a:9,b:12,c:15},{a:10,b:24,c:26},{a:11,b:60,c:61} ] },
+  { name: 'Level 3', stages: [ {a:5,b:12,c:13},{a:8,b:15,c:17},{a:12,b:35,c:37},{a:9,b:40,c:41},{a:20,b:21,c:29} ] }
+];
+const TOTAL_LEVELS = LEVELS.length;
+
+// platform positions (same across levels)
+const PLATFORM_POS = [ {x:150,y:520},{x:350,y:400},{x:580,y:400},{x:580,y:260},{x:780,y:160} ];
+const COINS_POS = PLATFORM_POS.map(p=>({x:p.x,y:p.y-36}));
+let coinsCollected = COINS_POS.map(_=>false);
+
+// ================= HUD & STATE =================
+const canvas = document.getElementById('game'); const ctx = canvas.getContext('2d');
+const startScreen = document.getElementById('startScreen'); const startBtn = document.getElementById('startBtn');
+const sidePanel = document.getElementById('sidePanel'); const endScreen = document.getElementById('endScreen');
+const restartBtn = document.getElementById('restartBtn');
+
+const soalText = document.getElementById('soalText'); const stepFeedback = document.getElementById('stepFeedback');
+const sqKnownA = document.getElementById('sqKnown1'); const sqKnownB = document.getElementById('sqKnown2');
+const opResultInput = document.getElementById('opResult'); const finalRootInput = document.getElementById('finalRoot');
+const checkStepBtn = document.getElementById('stepCheckBtn'); const resetBtn = document.getElementById('stepResetBtn');
+const levelNo = document.getElementById('levelNo'); const stageNo = document.getElementById('stageNo'); const statusText = document.getElementById('status');
+const hudScore = document.getElementById('hudScore'); const hudLevel = document.getElementById('hudLevel'); const hudTimer = document.getElementById('hudTimer');
+const progressBar = document.getElementById('progressBar');
+
+let currentLevel = 1, currentStage = 1;
+let charPos = {x:PLATFORM_POS[0].x,y:PLATFORM_POS[0].y-20};
+let animating = false, score = 0, levelTime = 60, timerRemaining = levelTime, timerInterval = null;
+
+// ================= DRAW HELPERS =================
+function drawBackground(){ const bg = bgImgs[currentLevel-1]; if(bg && bg.complete){ ctx.drawImage(bg,0,0,canvas.width,canvas.height); } else { ctx.fillStyle='#87ceeb'; ctx.fillRect(0,0,canvas.width,canvas.height); } }
+function drawPlatform(x,y){ if(platformImg.complete) { const w=160,h=80; ctx.drawImage(platformImg,x-w/2,y-h/2,w,h); } }
+function drawRope(x1,y1,x2,y2){ ctx.beginPath(); ctx.moveTo(x1,y1-10); ctx.lineTo(x2,y2-10); ctx.strokeStyle='rgba(40,40,40,0.95)'; ctx.lineWidth=3; ctx.stroke(); }
+function drawStick(x,y){ if(spiderImg.complete){ const w=90,h=90; ctx.drawImage(spiderImg,x-w/2,y-h/2,w,h); } }
+function drawCoin(x,y){ ctx.save(); ctx.beginPath(); ctx.shadowBlur=18; ctx.shadowColor='rgba(255,210,90,0.8)'; ctx.fillStyle='#ffcc33'; ctx.arc(x,y,12,0,Math.PI*2); ctx.fill(); ctx.beginPath(); ctx.fillStyle='rgba(255,255,255,0.7)'; ctx.arc(x-4,y-4,4,0,Math.PI*2); ctx.fill(); ctx.font='12px Inter, Arial'; ctx.fillStyle='#7a4a00'; ctx.textAlign='center'; ctx.fillText('?',x,y+4); ctx.restore(); }
+function drawPortal(x,y,scale=1,glow=1){ if(portalImg.complete){ const w=96*scale,h=96*scale; ctx.save(); ctx.globalAlpha = glow; ctx.drawImage(portalImg,x-w/2,y-h/2,w,h); ctx.restore(); } else { ctx.save(); ctx.beginPath(); ctx.arc(x,y,32*scale,0,Math.PI*2); ctx.fillStyle='rgba(80,160,255,0.6)'; ctx.fill(); ctx.restore(); } }
+
+// triangle & label rendering (reuse previous logic simplified)
+function getTrianglePoints(stage){ const p=PLATFORM_POS[stage-1]; const w=140,h=100; switch(stage){case 1:return{A:{x:p.x+30+110,y:p.y-10},B:{x:p.x+30+110,y:p.y-h-10},C:{x:p.x+30+110-w,y:p.y-10}};case 2:return{A:{x:p.x+30+120,y:p.y-10},B:{x:p.x+30+120,y:p.y-h-10},C:{x:p.x+30+120-w,y:p.y-10}};case 3:return{A:{x:p.x-30+110,y:p.y-10},B:{x:p.x-30+110,y:p.y-h-10},C:{x:p.x-30+110+w,y:p.y-10}};case 4:return{A:{x:p.x+30+120,y:p.y-10},B:{x:p.x+30+120,y:p.y-h-10},C:{x:p.x+30+120-w,y:p.y-10}};case 5:return{A:{x:p.x-30+50,y:p.y-10},B:{x:p.x-30+50,y:p.y-h-10},C:{x:p.x-30+50+w,y:p.y-10}};default:return null;} }
+// tentukan mana yang dicari
+function getUnknownSide(stage) {
+  if(stage === 1) return 'c';
+  if(stage === 2) return 'a';
+  if(stage === 3) return 'b';
+  if(stage === 4) return 'c';
+  if(stage === 5) return 'b';
+  return 'c';
+}
+
+function drawTriangleWithLabels(){
+  const tri = getTrianglePoints(currentStage);
+  if(!tri) return;
+
+  const st = LEVELS[currentLevel-1].stages[currentStage-1];
+  const unknown = getUnknownSide(currentStage);
+/// gambar segitiga (warna abu)
+ctx.beginPath();
+ctx.moveTo(tri.A.x, tri.A.y);
+ctx.lineTo(tri.B.x, tri.B.y);
+ctx.lineTo(tri.C.x, tri.C.y);
+ctx.closePath();
+
+// isi abu transparan
+ctx.fillStyle = 'rgba(120, 120, 120, 0.15)';
+ctx.fill();
+
+// garis tepi abu
+ctx.strokeStyle = 'rgba(100, 100, 100, 1)';
+ctx.lineWidth = 1.8;
+ctx.stroke();
+
+// sisi tebal (BC) warna abu gelap
+ctx.beginPath();
+ctx.moveTo(tri.B.x, tri.B.y);
+ctx.lineTo(tri.C.x, tri.C.y);
+ctx.strokeStyle = 'rgba(60, 60, 60, 1)';
+ctx.lineWidth = 3;
+ctx.stroke();
+
+
+  // tentukan label sesuai soal
+  const labelA = (unknown === 'a') ? 'a = ?' : `a = ${st.a}`;
+  const labelB = (unknown === 'b') ? 'b = ?' : `b = ${st.b}`;
+  const labelC = (unknown === 'c') ? 'c = ?' : `c = ${st.c}`;
+
+  // gambar segitiga
+  ctx.beginPath();
+  ctx.moveTo(tri.A.x, tri.A.y);
+  ctx.lineTo(tri.B.x, tri.B.y);
+  ctx.lineTo(tri.C.x, tri.C.y);
+  ctx.closePath();
+  ctx.fillStyle='rgba(100,150,255,0.06)';
+  ctx.fill();
+  ctx.strokeStyle='rgba(40,90,140,0.25)';
+  ctx.lineWidth=1.2;
+  ctx.stroke();
+
+  // sisi tebal
+  ctx.beginPath();
+  ctx.moveTo(tri.B.x, tri.B.y);
+  ctx.lineTo(tri.C.x, tri.C.y);
+  ctx.strokeStyle='rgba(40,40,40,0.95)';
+  ctx.lineWidth=2;
+  ctx.stroke();
+
+  // posisi label
+  const midAC={x:(tri.A.x+tri.C.x)/2,y:(tri.A.y+tri.C.y)/2};
+  const midAB={x:(tri.A.x+tri.B.x)/2,y:(tri.A.y+tri.B.y)/2};
+  const midBC={x:(tri.B.x+tri.C.x)/2,y:(tri.B.y+tri.C.y)/2};
+
+  // tampilkan label a,b,c
+ ctx.font = '14px Inter, Arial';
+ctx.textAlign = 'center';
+ctx.fillStyle = '#fff';  // warna putih
+ctx.fillText(labelA, midAC.x, midAC.y+6);
+ctx.fillText(labelB, midAB.x, midAB.y);
+ctx.fillText(labelC, midBC.x, midBC.y-6);
+
+}
+
+// ================= RENDER LOOP =================
+function renderScene(){ ctx.clearRect(0,0,canvas.width,canvas.height); drawBackground(); PLATFORM_POS.forEach(p=>drawPlatform(p.x,p.y)); COINS_POS.forEach((c,i)=>{ if(i===0) return; if(!coinsCollected[i]) drawCoin(c.x,c.y); }); drawTriangleWithLabels(); if(currentStage < PLATFORM_POS.length){ const nextP = PLATFORM_POS[currentStage]; drawRope(PLATFORM_POS[currentStage-1].x,PLATFORM_POS[currentStage-1].y,nextP.x,nextP.y); }
+  // draw character
+  if(!animating){ const pos = PLATFORM_POS[currentStage-1]; drawStick(pos.x,pos.y-20); charPos.x=pos.x; charPos.y=pos.y-20; } else { drawStick(charPos.x,charPos.y); }
+  // draw portal if on last platform of current level
+  if(currentStage === PLATFORM_POS.length){ const p = PLATFORM_POS[currentStage-1]; drawPortal(p.x, p.y-120, 1.4, 1); }
+}
+
+// ================= UI LOGIC (same as before, with sfx) =================
+const radios = document.querySelectorAll('input[name="formula"]'); radios.forEach(r=>{ r.addEventListener('change', ()=>{ if(animating) return; const chosen = document.querySelector('input[name="formula"]:checked').value; const lvl = LEVELS[currentLevel-1]; const st = lvl.stages[currentStage-1]; const info = (function(){ if(chosen==='c2=b2+a2') return {label1:'b²',label2:'a²',val1:st.b*st.b,val2:st.a*st.a}; if(chosen==='b2=c2-a2') return {label1:'c²',label2:'a²',val1:st.c*st.c,val2:st.a*st.a}; return {label1:'c²',label2:'b²',val1:st.c*st.c,val2:st.b*st.b}; })(); sqKnownA.disabled=false; sqKnownB.disabled=false; document.getElementById('sqLabels').innerText = `Masukkan ${info.label1} dan ${info.label2}`; stepFeedback.innerText='Langkah 1 benar. Isi Langkah 2 (kuadrat sisi-sisi yang diketahui).'; stepFeedback.className='feedback ok'; statusText.textContent='Isi kuadrat'; sqKnownA.focus(); }); });
+
+checkStepBtn.addEventListener('click', ()=>{ if(animating) return; const chosen = document.querySelector('input[name="formula"]:checked'); if(!chosen){ stepFeedback.innerText='Pilih rumus dulu.'; stepFeedback.className='feedback err'; sfxSalah.play(); return; } const key=chosen.value; const expectedKey = (function(s){ if(s===1) return 'c2=b2+a2'; if(s===2) return 'a2=c2-b2'; if(s===3) return 'b2=c2-a2'; if(s===4) return 'c2=b2+a2'; if(s===5) return 'b2=c2-a2'; return 'a2=c2-b2'; })(currentStage);
+  if(key!==expectedKey){ stepFeedback.innerText='Rumus tidak sesuai untuk stage ini.'; stepFeedback.className='feedback err'; sfxSalah.play(); return; }
+  if(sqKnownA.disabled||sqKnownA.value===''||sqKnownB.value===''){ sqKnownA.disabled=false; sqKnownB.disabled=false; stepFeedback.innerText='Isi kuadrat sisi-sisi yang diketahui.'; stepFeedback.className='feedback err'; sfxSalah.play(); return; }
+  const st = LEVELS[currentLevel-1].stages[currentStage-1]; const expected = (function(){ if(key==='c2=b2+a2') return {val1:st.b*st.b,val2:st.a*st.a}; if(key==='b2=c2-a2') return {val1:st.c*st.c,val2:st.a*st.a}; return {val1:st.c*st.c,val2:st.b*st.b}; })(); const v1=Number(sqKnownA.value), v2=Number(sqKnownB.value); const direct=(v1===expected.val1&&v2===expected.val2); const swapped=(v1===expected.val2&&v2===expected.val1); if(!direct&&!swapped){ stepFeedback.innerText=`Langkah 2 salah. Seharusnya ${expected.val1} dan ${expected.val2}.`; stepFeedback.className='feedback err'; sfxSalah.play(); return; }
+  if(opResultInput.disabled){ opResultInput.disabled=false; stepFeedback.innerText='Langkah 2 benar. Isi Langkah 3 (hasil operasi).'; stepFeedback.className='feedback ok'; statusText.textContent='Isi hasil operasi'; sfxNaik.play(); opResultInput.focus(); return; }
+  if(opResultInput.value===''){ stepFeedback.innerText='Isi hasil operasi (Langkah 3).'; stepFeedback.className='feedback err'; sfxSalah.play(); return; }
+  const opVal=Number(opResultInput.value); const expectedOp=(function(){ if(key==='c2=b2+a2') return st.b*st.b+st.a*st.a; if(key==='b2=c2-a2') return st.c*st.c-st.a*st.a; return st.c*st.c-st.b*st.b; })(); if(opVal!==expectedOp){ stepFeedback.innerText=`Langkah 3 salah. Seharusnya ${expectedOp}.`; stepFeedback.className='feedback err'; sfxSalah.play(); return; }
+  if(finalRootInput.disabled){ finalRootInput.disabled=false; stepFeedback.innerText='Langkah 3 benar. Isi Langkah 4 (akar).'; stepFeedback.className='feedback ok'; statusText.textContent='Isi akar'; sfxNaik.play(); finalRootInput.focus(); return; }
+  if(finalRootInput.value===''){ stepFeedback.innerText='Isi akar (Langkah 4).'; stepFeedback.className='feedback err'; sfxSalah.play(); return; }
+  const rootVal=Number(finalRootInput.value); const expectedRoot=Math.round(Math.sqrt(expectedOp)); if(Math.abs(rootVal-expectedRoot)>0.0001){ stepFeedback.innerText=`Langkah 4 salah. Akar seharusnya ${expectedRoot}.`; stepFeedback.className='feedback err'; sfxSalah.play(); return; }
+  // all correct => move to next stage or portal
+  stepFeedback.innerText='Semua langkah benar ✅. Melanjutkan...'; stepFeedback.className='feedback ok'; setTimeout(()=>{ proceedAfterCorrect(); },500);
+});
+
+resetBtn.addEventListener('click', () => {
+    if (animating) return;
+
+    // Jika waktu habis → penalti poin -25
+    if (timerRemaining <= 0) {
+        score = Math.max(0, score - 25);   // skor tidak boleh negatif
+        updateHUD();
+
+        // aktifkan kembali input seperti awal
+        document.querySelectorAll('input, button').forEach(el => {
+            if (el.id !== 'stepResetBtn') el.disabled = false;
+        });
+
+        sqKnownA.disabled = true;
+        sqKnownB.disabled = true;
+        opResultInput.disabled = true;
+        finalRootInput.disabled = true;
+
+        document.getElementById('sqLabels').innerText = 'Label sisi akan muncul setelah pilih rumus.';
+        stepFeedback.innerText = 'Silakan ulangi langkah.';
+        statusText.textContent = 'Siap';
+
+        // reset timer setelah penalti
+        startTimer();
+        return;
+    }
+
+    // -------------------------
+    // Jika *bukan* waktu habis:
+    // -------------------------
+    document.querySelectorAll('input[name="formula"]').forEach(r => r.checked = false);
+    sqKnownA.value = '';
+    sqKnownB.value = '';
+    opResultInput.value = '';
+    finalRootInput.value = '';
+    sqKnownA.disabled = true;
+    sqKnownB.disabled = true;
+    opResultInput.disabled = true;
+    finalRootInput.disabled = true;
+
+    document.getElementById('sqLabels').innerText = 'Label sisi akan muncul setelah pilih rumus.';
+    stepFeedback.innerText = '';
+    statusText.textContent = 'Siap';
+});
+
+
+// animation to next platform
+function animateAlongRopeToNext(){ if(animating) return; if(currentStage>=PLATFORM_POS.length){ return; } const from=PLATFORM_POS[currentStage-1], to=PLATFORM_POS[currentStage]; animating=true; const duration=700; const start=performance.now(); function frame(now){ const t=Math.min(1,(now-start)/duration); const easeT=t*t*(3-2*t); charPos.x = from.x + (to.x-from.x)*easeT; charPos.y = (from.y-20) + ((to.y-20)-(from.y-20))*easeT; renderScene(); if(t<1) requestAnimationFrame(frame); else { animating=false; sfxNaik.play(); currentStage++; collectCoinForStage(currentStage-1); resetInputsForStage(); updateSoalUI(); renderScene(); updateProgressBar(); startTimer(); } } requestAnimationFrame(frame); }
+
+function collectCoinForStage(i){ if(!coinsCollected[i]){ coinsCollected[i]=true; sfxCoin.play(); score+=75; updateHUD(); } }
+function resetInputsForStage(){ document.querySelectorAll('input[name="formula"]').forEach(r=>r.checked=false); sqKnownA.value=''; sqKnownB.value=''; opResultInput.value=''; finalRootInput.value=''; sqKnownA.disabled=true; sqKnownB.disabled=true; opResultInput.disabled=true; finalRootInput.disabled=true; document.getElementById('sqLabels').innerText='Label sisi akan muncul setelah pilih rumus.'; stepFeedback.innerText=''; statusText.textContent='Siap'; }
+function proceedAfterCorrect() {
+    // Jika belum di platform terakhir → naik ke platform berikutnya
+    if (currentStage < PLATFORM_POS.length) {
+        animateAlongRopeToNext();
+    } 
+    // Jika sudah sampai platform 5 → masuk portal
+    else {
+        enterPortalSequence();
+    }
+}
+
+// portal sequence: spider moves into portal, fade out, advance level (auto)
+function enterPortalSequence(){ if(animating) return; animating=true; const p = PLATFORM_POS[PLATFORM_POS.length-1]; const portalX = p.x; const portalY = p.y-120; const start = performance.now(); const duration = 900; // move spider to portal
+  function frame(now){ const t = Math.min(1, (now-start)/duration); const easeT = t*t*(3-2*t); charPos.x = charPos.x + (portalX - charPos.x) * easeT; charPos.y = charPos.y + (portalY - charPos.y) * easeT; renderScene(); // portal glow scale
+    if(t<1) requestAnimationFrame(frame); else { // play sound, fade out
+        sfxNaik.play(); // little whoosh
+        fadeOutCanvasThenAdvance(); } }
+  requestAnimationFrame(frame);
+}
+
+function fadeOutCanvasThenAdvance(){ const canvasEl = document.getElementById('game'); let alpha = 1; const fade = setInterval(()=>{ alpha -= 0.06; canvasEl.style.opacity = String(Math.max(0,alpha)); sidePanel.style.opacity = String(Math.max(0,alpha)); if(alpha <= 0){ clearInterval(fade); // advance level or show ending
+        currentLevel++; if(currentLevel > TOTAL_LEVELS){ showEndScreen(); } else { // reset for next level
+            currentStage = 1; coinsCollected = COINS_POS.map(_=>false); score = score; // preserve score
+            updateSoalUI(); updateHUD(); updateProgressBar(); // switch bg auto by currentLevel
+            // restore opacity and render
+            canvasEl.style.opacity = '0'; canvasEl.style.visibility='visible'; sidePanel.style.opacity='0'; sidePanel.style.visibility='visible'; setTimeout(()=>{ canvasEl.style.opacity='1'; sidePanel.style.opacity='1'; renderScene(); },150);
+        } animating=false; } },40); }
+
+function showEndScreen(){ // hide game and panel, show end overlay
+  document.getElementById('game').style.visibility='hidden'; document.getElementById('game').style.opacity='0'; sidePanel.style.visibility='hidden'; sidePanel.style.opacity='0'; endScreen.style.display='flex'; }
+
+restartBtn.addEventListener('click', ()=>{ // reset everything
+  currentLevel = 1; currentStage = 1; score = 0; coinsCollected = COINS_POS.map(_=>false); endScreen.style.display='none'; startScreen.classList.remove('hidden'); document.getElementById('game').style.visibility='hidden'; document.getElementById('game').style.opacity='0'; sidePanel.style.visibility='hidden'; sidePanel.style.opacity='0'; });
+
+// HUD & TIMER
+function updateProgressBar(){ const total = PLATFORM_POS.length; const progress = (currentStage-1)/(total-1); progressBar.style.width = `${Math.round(progress*100)}%`; hudLevel.textContent = `LEVEL: ${currentLevel}-${currentStage}`; }
+function updateHUD(){ hudScore.textContent = `SCORE: ${String(score).padStart(4,'0')}`; hudTimer.textContent = `TIME: 0:${String(timerRemaining).padStart(2,'0')}`; }
+function startTimer(){ if(timerInterval) clearInterval(timerInterval); timerRemaining = levelTime; timerInterval = setInterval(()=>{ timerRemaining--; if(timerRemaining < 0){ clearInterval(timerInterval); timerRemaining = 0; statusText.textContent = 'Waktu habis'; stepFeedback.innerText = 'Waktu habis — coba lagi.'; document.querySelectorAll('input, button').forEach(el=>{ if(el.id !== 'stepResetBtn') el.disabled = true; }); } updateHUD(); },1000); }
+
+// allow Enter in specific inputs to submit
+opResultInput.addEventListener('keydown', (e)=>{ if(e.key==='Enter'){ if(animating) return; checkStepBtn.click(); } });
+finalRootInput.addEventListener('keydown', (e)=>{ if(e.key==='Enter'){ if(animating) return; checkStepBtn.click(); } });
+
+window.addEventListener('keydown',(e)=>{ if(e.key==='Enter'){ if(animating) return; checkStepBtn.click(); } });
+
+// update soal for current level & stage
+function updateSoalUI(){ const lvl = LEVELS[currentLevel-1]; const st = lvl.stages[currentStage-1]; let soal=''; if(currentStage===1) soal=`Diketahui a = ${st.a}, b = ${st.b}. Hitung sisi miring (c).`; else if(currentStage===4) soal=`Diketahui a = ${st.a}, b = ${st.b}. Hitung sisi miring (c).`; else if(currentStage===5) soal=`Diketahui a = ${st.a}, c = ${st.c}. Hitung sisi tegak (b).`; else if(currentStage===2) soal=`Diketahui b = ${st.b}, c = ${st.c}. Hitung sisi datar (a).`; else if(currentStage===3) soal=`Diketahui a = ${st.a}, c = ${st.c}. Hitung sisi tegak (b).`; soalText.innerText = soal; levelNo.textContent = currentLevel; stageNo.textContent = currentStage; statusText.textContent = 'Isi langkah-langkah'; document.querySelectorAll('input[name="formula"]').forEach(r=>r.checked=false); sqKnownA.value=''; sqKnownB.value=''; opResultInput.value=''; finalRootInput.value=''; sqKnownA.disabled=true; sqKnownB.disabled=true; opResultInput.disabled=true; finalRootInput.disabled=true; document.getElementById('sqLabels').innerText='Label sisi akan muncul setelah pilih rumus.'; stepFeedback.innerText=''; renderScene(); }
+
+// Start screen handler
+function startGame(){ document.getElementById('game').style.visibility='visible'; document.getElementById('game').style.opacity='1'; sidePanel.style.visibility='visible'; sidePanel.style.opacity='1'; startScreen.classList.add('hidden'); // ensure bg image used for startScreen was set earlier
+  updateSoalUI(); updateHUD(); updateProgressBar(); renderScene(); startTimer(); // play bg music (user gesture)
+  bgm.play().catch(()=>{});
+}
+startBtn.addEventListener('click', ()=>{ startScreen.style.transition='opacity 400ms ease'; startScreen.style.opacity='0'; setTimeout(()=>{ startGame(); },420); });
+
+// initial render
+renderScene();
+
+</script>
+</body>
+</html>
