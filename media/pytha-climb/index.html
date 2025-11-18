@@ -48,36 +48,13 @@
   .hud .box{padding:8px 12px;border-radius:10px;background:var(--hud-bg);backdrop-filter: blur(4px);border:1px solid rgba(255,255,255,0.2);color:#fff;font-weight:800;text-shadow:0 1px 1px rgba(0,0,0,0.2)}
   .progressWrap{flex:1;margin:0 12px;height:12px;border-radius:12px;background:rgba(255,255,255,0.12);overflow:hidden;border:1px solid rgba(0,0,0,0.06)}
   .progressBar{height:100%;width:0%;background:linear-gradient(90deg,#ffd36b,#ff7f50);box-shadow:0 4px 8px rgba(255,127,80,0.18)}
-  /* kecilkan canvas saja */
-#game {
-    transform: scale(0.85);
+  .hud {
+    transform: translateX(-50%) scale(0.85);
     transform-origin: top center;
 }
 
-/* HUD jangan ikut kecil → posisikan ulang agar pas */
-.hud {
-    position: absolute;
-    left: 50%;
-    transform: translateX(-50%);
-    top: -5px;        /* HUD dinaikkan sedikit */
-    width: 640px;
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    gap: 12px;
-    pointer-events: none;
-    z-index: 50;      /* pastikan HUD berada di atas canvas */
-}
-canvas {
-    width: 100%;
-    height: auto;
-    display: block;
-}
-
-
 </style>
 </head>
-<script src="autoscale.js"></script>
 <body>
   <div class="wrap">
     <header>
